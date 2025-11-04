@@ -412,7 +412,7 @@ elif menu == "💬 CPE Chatbot":
         "project": "Major projects are often submitted through Google Classroom or the department office.",
         "subject": "CPE 2nd year subjects include Logic Circuits, Data Structures, Computer Organization, and AI Fundamentals.",
         "adviser": "Your class adviser can be contacted through the CPE Faculty Messenger Group or during office hours.",
-        "office": "The CPE Department Office is located near the Dean’s Office, College of Engineering Building.",
+        "office": "The CPE  Office is located in 2nd floor, College of Informatics and Computer Sciences.",
         "requirement": "Requirements include attendance, lab projects, quizzes, and final exams for each subject.",
         "exam": "Midterms usually happen around Week 8; Finals on Week 16."
     }
@@ -443,6 +443,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
