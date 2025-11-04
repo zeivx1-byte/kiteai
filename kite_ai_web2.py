@@ -5,173 +5,97 @@
 import streamlit as st
 import numpy as np
 import os
-import base64
 
 # --- Modern Sophisticated UI Theme ---
 st.set_page_config(page_title="KITE-AI Web 2.0", page_icon="🤖", layout="wide")
 
+# === GLOBAL THEME (Dark Neon Style + Red Header) ===
 st.markdown("""
-    <style>
-        [data-testid="stAppViewContainer"] {
-            background: radial-gradient(circle at top left, #0a0a0f 0%, #101520 60%, #0b0c10 100%);
-            color: white !important;
-            font-family: 'Segoe UI', sans-serif;
-        }
-        [data-testid="stSidebar"] {
-            background: rgba(25, 25, 35, 0.7);
-            backdrop-filter: blur(15px);
-            border-right: 1px solid rgba(0, 194, 255, 0.2);
-        }
-        h1, h2, h3, h4 {
-            color: #00E0FF !important;
-            text-shadow: 0 0 20px rgba(0, 224, 255, 0.3);
-        }
-        button[kind="primary"] {
-            background: linear-gradient(135deg, #00C2FF, #0066FF);
-            color: white !important;
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 0 15px rgba(0,194,255,0.3);
-            transition: all 0.2s ease-in-out;
-        }
-        button {
-            background-color: rgba(20, 25, 35, 0.9) !important;
-            color: #00E0FF !important;
-            border: 1px solid rgba(0,224,255,0.2);
-            border-radius: 10px;
-            transition: 0.2s;
-        }
-        button:hover {
-            background-color: rgba(30, 40, 55, 0.9) !important;
-            box-shadow: 0 0 20px rgba(0,224,255,0.4);
-        }
-        [data-testid="stSidebarNav"]::before {
-            content: "🧠 KITE-AI SYSTEM";
-            margin-left: 15px;
-            margin-top: 10px;
-            font-size: 20px;
-            font-weight: 600;
-            color: #00E0FF;
-            text-shadow: 0 0 20px rgba(0,224,255,0.4);
-        }
-        footer {visibility: hidden;}
-    </style>
+<style>
+/* === GLOBAL BACKGROUND === */
+[data-testid="stAppViewContainer"] {
+    background: radial-gradient(circle at top left, #0a0a0f 0%, #101520 60%, #0b0c10 100%);
+    color: white !important;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* === HEADER FIX === */
+header[data-testid="stHeader"] {
+    background: linear-gradient(90deg, #2b0000, #4a0000, #2b0000);
+    color: #FF4C4C !important;
+    box-shadow: 0 0 25px rgba(255, 60, 60, 0.3);
+    border-bottom: 1px solid rgba(255, 80, 80, 0.4);
+}
+
+/* === SIDEBAR === */
+[data-testid="stSidebar"] {
+    background: rgba(30, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    border-right: 1px solid rgba(255, 50, 50, 0.2);
+}
+[data-testid="stSidebar"] * {
+    color: #FFD6D6 !important;
+}
+
+/* === HEADINGS === */
+h1, h2, h3, h4 {
+    color: #FF4C4C !important;
+    text-shadow: 0 0 25px rgba(255, 60, 60, 0.5);
+}
+
+/* === BUTTONS === */
+button[kind="primary"] {
+    background: linear-gradient(135deg, #B00000, #FF0000);
+    color: white !important;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 0 15px rgba(255, 60, 60, 0.3);
+    transition: all 0.2s ease-in-out;
+}
+button[kind="primary"]:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
+}
+button {
+    background-color: rgba(40, 0, 0, 0.8) !important;
+    color: #FF4C4C !important;
+    border: 1px solid rgba(255, 50, 50, 0.4);
+    border-radius: 10px;
+    transition: 0.3s;
+}
+button:hover {
+    background-color: rgba(70, 0, 0, 0.9) !important;
+    box-shadow: 0 0 20px rgba(255, 60, 60, 0.4);
+}
+
+/* === SIDEBAR TITLE === */
+[data-testid="stSidebarNav"]::before {
+    content: "🔥 KITE-AI SYSTEM";
+    margin-left: 15px;
+    margin-top: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #FF4C4C;
+    text-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
+}
+
+/* === FOOTER HIDDEN === */
+footer {visibility: hidden;}
+</style>
 """, unsafe_allow_html=True)
-
-# --- Header Section ---
-st.markdown("""
-    <style>
-        /* === GLOBAL BACKGROUND === */
-        [data-testid="stAppViewContainer"] {
-            background: radial-gradient(circle at top left, #120000 0%, #1a0000 50%, #0b0000 100%);
-            color: #ffffff !important;
-            font-family: 'Segoe UI', sans-serif;
-        }
-# === FIX WHITE HEADER & ADJUST TEXT COLOR ===
-st.markdown("""
-    <style>
-        /* Remove Streamlit default header white bar */
-        header[data-testid="stHeader"] {
-            background: linear-gradient(90deg, #2b0000, #4a0000, #2b0000);
-            color: #FF4C4C !important;
-            box-shadow: 0 0 25px rgba(255, 60, 60, 0.3);
-            border-bottom: 1px solid rgba(255, 80, 80, 0.4);
-        }
-
-        /* Change all default text to more readable color */
-        [data-testid="stMarkdownContainer"], p, span, div {
-            color: #FFEAEA !important;
-        }
-
-        /* Sidebar text color fix */
-        [data-testid="stSidebar"] * {
-            color: #FFD6D6 !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
-
-        /* === SIDEBAR === */
-        [data-testid="stSidebar"] {
-            background: rgba(30, 0, 0, 0.8);
-            backdrop-filter: blur(15px);
-            border-right: 1px solid rgba(255, 50, 50, 0.2);
-        }
-
-        /* === HEADINGS === */
-        h1, h2, h3, h4 {
-            color: #FF4C4C !important;
-            text-shadow: 0 0 25px rgba(255, 60, 60, 0.5);
-        }
-
-        /* === BUTTONS === */
-        button[kind="primary"] {
-            background: linear-gradient(135deg, #B00000, #FF0000);
-            color: white !important;
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 0 15px rgba(255, 60, 60, 0.3);
-            transition: all 0.2s ease-in-out;
-        }
-
-        button[kind="primary"]:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
-        }
-
-        button {
-            background-color: rgba(40, 0, 0, 0.8) !important;
-            color: #FF4C4C !important;
-            border: 1px solid rgba(255, 50, 50, 0.4);
-            border-radius: 10px;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background-color: rgba(70, 0, 0, 0.9) !important;
-            box-shadow: 0 0 20px rgba(255, 60, 60, 0.4);
-        }
-
-        /* === SIDEBAR TITLE === */
-        [data-testid="stSidebarNav"]::before {
-            content: "🔥 KITE-AI SYSTEM";
-            margin-left: 15px;
-            margin-top: 10px;
-            font-size: 20px;
-            font-weight: 700;
-            color: #FF4C4C;
-            text-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
-        }
-
-        /* === INPUTS, BOXES, AND TEXT AREAS === */
-        .stMarkdown, .stTextInput, .stNumberInput, .stSelectbox, .stTextArea {
-            background-color: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 10px;
-            color: #fff !important;
-        }
-
-        /* === FOOTER === */
-        footer {visibility: hidden;}
-    </style>
-""", unsafe_allow_html=True)
-
 
 # --- Sidebar Menu ---
 menu = st.sidebar.radio(
     "Navigation",
-    ["🏠 Home", "🗂️ Task Manager", "⚙️ Physics Calculator", "📏 Unit Converter",
-     "🔌 Electrical Assistant", "💬 CPE Chatbot", "📘 About"]
+    ["🏠 Home", "🗂️ Task Manager", "⚙️ Physics Calculator",
+     "📏 Unit Converter", "🔌 Electrical Assistant",
+     "💬 CPE Chatbot", "📘 About"]
 )
 
 # -------------------- HOME --------------------
-# -------------------- HOME --------------------
 if menu == "🏠 Home":
-
-    # --- Load BSU banner image from GitHub repository ---
     bg_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/BSU.jpg"
 
-    # --- Apply Custom Hero Banner Style ---
     st.markdown(f"""
     <style>
     .hero {{
@@ -186,13 +110,13 @@ if menu == "🏠 Home":
         display: flex;
         flex-direction: column;
         justify-content: center;
-        box-shadow: 0 0 30px rgba(0,224,255,0.3);
+        box-shadow: 0 0 30px rgba(255,60,60,0.4);
     }}
     .overlay {{
         position: absolute;
         top: 0; left: 0;
         width: 100%; height: 100%;
-        background: rgba(0,0,20,0.6);
+        background: rgba(0,0,0,0.5);
         border-radius: 15px;
     }}
     .hero-content {{
@@ -203,28 +127,22 @@ if menu == "🏠 Home":
     .hero h1 {{
         font-size: 55px;
         font-weight: 800;
-        color: #00E0FF;
-        text-shadow: 0 0 25px rgba(0,224,255,0.7);
-        margin-bottom: 10px;
+        color: #FF4C4C;
+        text-shadow: 0 0 25px rgba(255,60,60,0.7);
     }}
     .hero h3 {{
         font-size: 22px;
-        background: rgba(0, 194, 255, 0.8);
+        background: rgba(255, 0, 0, 0.6);
         display: inline-block;
         padding: 10px 25px;
         border-radius: 10px;
         color: white;
         font-weight: 600;
-        box-shadow: 0 0 20px rgba(0,224,255,0.4);
-    }}
-    @media (max-width: 768px) {{
-        .hero h1 {{ font-size: 32px; }}
-        .hero h3 {{ font-size: 16px; padding: 8px 18px; }}
+        box-shadow: 0 0 20px rgba(255,60,60,0.4);
     }}
     </style>
     """, unsafe_allow_html=True)
 
-    # --- Hero Section Content ---
     st.markdown("""
     <div class="hero">
         <div class="overlay"></div>
@@ -253,7 +171,6 @@ elif menu == "🗂️ Task Manager":
                 f.write(t + "\n")
 
     tasks = load_tasks()
-
     new_task = st.text_input("Add new task:")
     if st.button("Add Task"):
         if new_task:
@@ -392,10 +309,10 @@ elif menu == "💬 CPE Chatbot":
     st.header("💬 CPE Student ChatBot")
     st.markdown("Ask me anything about Computer Engineering 2nd Year!")
 
-    user_input = st.text_input("You:", placeholder="e.g., Where is Engr. Cruz's office?")
+    user_input = st.text_input("You:", placeholder="e.g., Where is Prof Acob office?")
     responses = {
-        "teacher": "Most CPE professors can be found in the College of Engineering Faculty Room, 2nd floor.",
-        "engr cruz": "Engr. Cruz usually handles Digital Systems and can be found in Room 204.",
+        "teacher": "Most CPE professors can be found in the CICS, CPE Faculty 2nd floor.",
+        "prof acob": "Proffesor Acob usually handles computer related courses and can be found in CICS or in CPE Lab.",
         "engr de los reyes": "Engr. De los Reyes often teaches on the 4th floor CEAF Building — check the Circuit Lab.",
         "class schedule": "CPE 2nd year usually has major subjects from 8:00 AM to 5:00 PM.",
         "project": "Major projects are often submitted through Google Classroom or the department office.",
@@ -431,8 +348,3 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
-
-
-
-
-
