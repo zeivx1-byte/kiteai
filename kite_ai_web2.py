@@ -67,6 +67,28 @@ st.markdown("""
             color: #ffffff !important;
             font-family: 'Segoe UI', sans-serif;
         }
+# === FIX WHITE HEADER & ADJUST TEXT COLOR ===
+st.markdown("""
+    <style>
+        /* Remove Streamlit default header white bar */
+        header[data-testid="stHeader"] {
+            background: linear-gradient(90deg, #2b0000, #4a0000, #2b0000);
+            color: #FF4C4C !important;
+            box-shadow: 0 0 25px rgba(255, 60, 60, 0.3);
+            border-bottom: 1px solid rgba(255, 80, 80, 0.4);
+        }
+
+        /* Change all default text to more readable color */
+        [data-testid="stMarkdownContainer"], p, span, div {
+            color: #FFEAEA !important;
+        }
+
+        /* Sidebar text color fix */
+        [data-testid="stSidebar"] * {
+            color: #FFD6D6 !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
         /* === SIDEBAR === */
         [data-testid="stSidebar"] {
@@ -408,6 +430,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
