@@ -93,9 +93,11 @@ menu = st.sidebar.radio(
 )
 
 # -------------------- HOME --------------------
+# -------------------- HOME --------------------
 if menu == "🏠 Home":
     bg_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/BSU.jpg"
 
+    # --- Hero Banner ---
     st.markdown(f"""
     <style>
     .hero {{
@@ -140,9 +142,31 @@ if menu == "🏠 Home":
         font-weight: 600;
         box-shadow: 0 0 20px rgba(255,60,60,0.4);
     }}
+    .vision {{
+        margin-top: 60px;
+        padding: 30px;
+        background: rgba(40, 0, 0, 0.6);
+        border-radius: 15px;
+        box-shadow: 0 0 25px rgba(255, 60, 60, 0.3);
+        text-align: center;
+    }}
+    .vision h2 {{
+        color: #FF4C4C;
+        text-shadow: 0 0 20px rgba(255,60,60,0.5);
+        font-size: 34px;
+        margin-bottom: 15px;
+    }}
+    .vision p {{
+        color: #FFEAEA;
+        font-size: 18px;
+        line-height: 1.6;
+        margin: 0 auto;
+        max-width: 850px;
+    }}
     </style>
     """, unsafe_allow_html=True)
 
+    # --- Hero Section ---
     st.markdown("""
     <div class="hero">
         <div class="overlay"></div>
@@ -150,6 +174,19 @@ if menu == "🏠 Home":
             <h1>WELCOME TO THE KITE WEB COMPANION</h1>
             <h3>Empowering Computer Engineering Students with Essential Tools</h3>
         </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # --- VISION Section ---
+    st.markdown("""
+    <div class="vision">
+        <h2>Our VISION</h2>
+        <p>
+        At <strong>COMKITE</strong>, we are dedicated to revolutionizing the learning experience 
+        for Computer Engineering students. Our goal is to provide a comprehensive suite of 
+        computational tools and resources to enhance their academic journey and prepare them 
+        for real-world challenges.
+        </p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -348,3 +385,4 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
