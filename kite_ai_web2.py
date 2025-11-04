@@ -1,7 +1,7 @@
 # kite_ai_web2.py
 # Streamlit Web Version of KITE-AI (Integrated for CPE 2nd Year)
-# Includes Physics, Circuits, AI Toolkit, Task Manager, and CPE Chatbot
-echo "# kiteai" >> README.md
+# Includes Physics, Circuits, AI Toolkit, Task Manager, and CPE Chatbot echo "
+# kiteai" >> README.md
 git init
 git add README.md
 git commit -m "first commit"
@@ -394,3 +394,4 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
