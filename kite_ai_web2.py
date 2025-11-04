@@ -78,18 +78,8 @@ menu = st.sidebar.radio(
 # -------------------- HOME --------------------
 if menu == "🏠 Home":
 
-    # --- Load BSU banner image dynamically ---
-    image_path = os.path.join(os.path.expanduser("~"), "Downloads", "BSU.jpg")
-
-    def get_base64_image(image_path):
-        with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode()
-
-    if os.path.exists(image_path):
-        encoded_img = get_base64_image(image_path)
-        bg_url = f"data:image/jpeg;base64,{encoded_img}"
-    else:
-        bg_url = "https://upload.wikimedia.org/wikipedia/commons/4/4c/Batangas_State_University_Main_Campus.jpg"
+    # --- Load BSU banner image from GitHub repository ---
+bg_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/BSU.jpg"
 
     # --- Apply Custom Hero Banner Style ---
     st.markdown(f"""
@@ -351,3 +341,4 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
