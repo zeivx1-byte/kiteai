@@ -73,7 +73,7 @@ st.markdown("""
 menu = st.sidebar.radio(
     "Navigation",
     ["🏠 Home", "🗂️ Task Manager", "⚙️ Physics Calculator", "📏 Unit Converter",
-     "🔌 Electrical Assistant", "🧠 AI Toolkit", "💬 CPE Chatbot", "📘 About"]
+     "🔌 Electrical Assistant", "💬 CPE Chatbot", "📘 About"]
 )
 
 # -------------------- HOME --------------------
@@ -284,4 +284,5 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
