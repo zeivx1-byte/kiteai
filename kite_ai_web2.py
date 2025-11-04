@@ -33,9 +33,18 @@ st.markdown("""
             box-shadow: 0 0 15px rgba(0,194,255,0.3);
             transition: all 0.2s ease-in-out;
         }
-        button[kind="primary"]:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(0,194,255,0.6);
+        button {
+    background-color: rgba(20, 25, 35, 0.9) !important;
+    color: #00E0FF !important;
+    border: 1px solid rgba(0,224,255,0.2);
+    border-radius: 10px;
+    transition: 0.2s;
+}
+button:hover {
+    background-color: rgba(30, 40, 55, 0.9) !important;
+    box-shadow: 0 0 20px rgba(0,224,255,0.4);
+}
+
         }
         [data-testid="stSidebarNav"]::before {
             content: "🧠 KITE-AI SYSTEM";
@@ -275,3 +284,4 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
