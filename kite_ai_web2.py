@@ -76,10 +76,11 @@ menu = st.sidebar.radio(
 )
 
 # -------------------- HOME --------------------
+# -------------------- HOME --------------------
 if menu == "🏠 Home":
 
     # --- Load BSU banner image from GitHub repository ---
-bg_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/BSU.jpg"
+    bg_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/BSU.jpg"
 
     # --- Apply Custom Hero Banner Style ---
     st.markdown(f"""
@@ -341,4 +342,5 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
