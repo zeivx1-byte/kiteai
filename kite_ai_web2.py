@@ -363,6 +363,38 @@ elif menu == "🔌 Electrical Assistant":
                 st.error("Invalid input.")
 
 # -------------------- CPE CHATBOT --------------------
+# --- Chatbot Styling ---
+st.markdown("""
+<style>
+/* Chat container */
+.chat-message {
+    border-radius: 12px;
+    padding: 12px 18px;
+    margin: 8px 0;
+    max-width: 85%;
+    line-height: 1.5;
+    font-size: 16px;
+}
+
+/* User message bubble */
+.chat-message.user {
+    background-color: #FF4C4C;
+    color: white;
+    margin-left: auto;
+    text-align: right;
+    box-shadow: 0 0 15px rgba(255,60,60,0.5);
+}
+
+/* Assistant message bubble */
+.chat-message.assistant {
+    background-color: #f5f5f5;
+    color: #222;
+    margin-right: auto;
+    text-align: left;
+    box-shadow: 0 0 15px rgba(255,255,255,0.2);
+}
+</style>
+""", unsafe_allow_html=True)
 elif menu == "💬 CPE Chatbot":
     st.header("💬 CPE Student ChatBot")
     st.markdown("Ask me anything about Computer Engineering 2nd Year!")
@@ -390,8 +422,9 @@ elif menu == "💬 CPE Chatbot":
                 response = reply
                 break
 
-        st.chat_message("user").write(user_input)
-        st.chat_message("assistant").write(response)
+        st.markdown(f'<div class="chat-message user">{user_input}</div>', unsafe_allow_html=True)
+st.markdown(f'<div class="chat-message assistant">{response}</div>', unsafe_allow_html=True)
+
 
 # -------------------- ABOUT --------------------
 elif menu == "📘 About":
@@ -406,6 +439,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
