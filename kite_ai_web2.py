@@ -1,13 +1,6 @@
 # kite_ai_web2.py
 # Streamlit Web Version of KITE-AI (Integrated for CPE 2nd Year)
-# Includes Physics, Circuits, AI Toolkit, Task Manager, and CPE Chatbot echo "
-# kiteai" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/zeivx1-byte/kiteai.git
-git push -u origin main
+# Includes Physics, Circuits, AI Toolkit, Task Manager, and CPE Chatbot
 
 import streamlit as st
 import numpy as np
@@ -18,34 +11,20 @@ st.set_page_config(page_title="KITE-AI Web 2.0", page_icon="🤖", layout="wide"
 
 st.markdown("""
     <style>
-        /* Main App Background */
         [data-testid="stAppViewContainer"] {
             background: radial-gradient(circle at top left, #0a0a0f 0%, #101520 60%, #0b0c10 100%);
             color: white !important;
             font-family: 'Segoe UI', sans-serif;
         }
-
-        /* Sidebar */
         [data-testid="stSidebar"] {
             background: rgba(25, 25, 35, 0.7);
             backdrop-filter: blur(15px);
             border-right: 1px solid rgba(0, 194, 255, 0.2);
         }
-
-        /* Headings */
         h1, h2, h3, h4 {
             color: #00E0FF !important;
             text-shadow: 0 0 20px rgba(0, 224, 255, 0.3);
         }
-
-        /* Cards & Inputs */
-        .stMarkdown, .stTextInput, .stNumberInput, .stSelectbox, .stTextArea {
-            background-color: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 10px;
-        }
-
-        /* Buttons */
         button[kind="primary"] {
             background: linear-gradient(135deg, #00C2FF, #0066FF);
             color: white !important;
@@ -58,8 +37,6 @@ st.markdown("""
             transform: scale(1.05);
             box-shadow: 0 0 25px rgba(0,194,255,0.6);
         }
-
-        /* Sidebar Text */
         [data-testid="stSidebarNav"]::before {
             content: "🧠 KITE-AI SYSTEM";
             margin-left: 15px;
@@ -69,31 +46,7 @@ st.markdown("""
             color: #00E0FF;
             text-shadow: 0 0 20px rgba(0,224,255,0.4);
         }
-
-        /* Chat Bubbles */
-        .user-bubble {
-            background-color: #00C2FF;
-            color: black;
-            padding: 10px 15px;
-            border-radius: 18px 18px 0 18px;
-            margin: 5px;
-            max-width: 70%;
-            align-self: flex-end;
-        }
-        .bot-bubble {
-            background-color: #1f2a40;
-            color: #e0e0e0;
-            padding: 10px 15px;
-            border-radius: 18px 18px 18px 0;
-            margin: 5px;
-            max-width: 70%;
-            align-self: flex-start;
-        }
-
-        /* Footer */
-        footer {
-            visibility: hidden;
-        }
+        footer {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 
@@ -278,78 +231,6 @@ elif menu == "🔌 Electrical Assistant":
             except:
                 st.error("Invalid input.")
 
-# -------------------- AI TOOLKIT --------------------
-elif menu == "🧠 AI Toolkit":
-    st.header("🧠 AI Toolkit")
-    tool = st.selectbox("Choose AI Module:", [
-        "Logic Gates",
-        "Number Converter",
-        "Matrix Operations",
-        "Perceptron Demo"
-    ])
-
-    # Logic Gates
-    if tool == "Logic Gates":
-        st.subheader("Logic Gate Simulator")
-        a = st.selectbox("Input A", [0, 1])
-        b = st.selectbox("Input B", [0, 1])
-        gate = st.selectbox("Gate", ["AND", "OR", "XOR", "NOT"])
-        if gate == "AND":
-            st.success(f"Output: {a & b}")
-        elif gate == "OR":
-            st.success(f"Output: {a | b}")
-        elif gate == "XOR":
-            st.success(f"Output: {a ^ b}")
-        elif gate == "NOT":
-            st.success(f"Output: {int(not a)}")
-
-    # Number Converter
-    elif tool == "Number Converter":
-        num = st.text_input("Enter number:")
-        base = st.selectbox("Base", [2, 8, 10, 16])
-        if num:
-            try:
-                dec = int(num, base)
-                st.write(f"Decimal: {dec}")
-                st.write(f"Binary: {bin(dec)[2:]}")
-                st.write(f"Octal: {oct(dec)[2:]}")
-                st.write(f"Hex: {hex(dec)[2:].upper()}")
-            except:
-                st.error("Invalid number.")
-
-    # Matrix Operations
-    elif tool == "Matrix Operations":
-        st.subheader("Matrix Addition")
-        A = st.text_area("Matrix A (e.g., 1 2, 3 4)")
-        B = st.text_area("Matrix B (e.g., 5 6, 7 8)")
-        if st.button("Add Matrices"):
-            try:
-                A_mat = np.array([list(map(float, row.split())) for row in A.split(",")])
-                B_mat = np.array([list(map(float, row.split())) for row in B.split(",")])
-                if A_mat.shape == B_mat.shape:
-                    st.success(f"Result:\n{A_mat + B_mat}")
-                else:
-                    st.error("Matrix sizes must match.")
-            except:
-                st.error("Invalid matrix input.")
-
-    # Perceptron Demo
-    elif tool == "Perceptron Demo":
-        st.subheader("Perceptron Demo (AND Gate)")
-        X = np.array([[0,0],[0,1],[1,0],[1,1]])
-        Y = np.array([0,0,0,1])
-        lr = st.slider("Learning Rate", 0.01, 1.0, 0.1)
-        epochs = st.slider("Epochs", 1, 50, 10)
-        if st.button("Train"):
-            w = np.zeros(2)
-            b = 0
-            for _ in range(epochs):
-                for xi, target in zip(X, Y):
-                    y_pred = 1 if np.dot(w, xi) + b >= 0 else 0
-                    w += lr * (target - y_pred) * xi
-                    b += lr * (target - y_pred)
-            st.success(f"Weights: {w}, Bias: {b:.3f}")
-
 # -------------------- CPE CHATBOT --------------------
 elif menu == "💬 CPE Chatbot":
     st.header("💬 CPE Student ChatBot")
@@ -394,4 +275,3 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
-
