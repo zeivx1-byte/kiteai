@@ -362,47 +362,51 @@ elif menu == "🔌 Electrical Assistant":
             except:
                 st.error("Invalid input.")
 
+
 # -------------------- CPE CHATBOT --------------------
-# --- Chatbot Styling ---
-st.markdown("""
-<style>
-/* Chat container */
-.chat-message {
-    border-radius: 12px;
-    padding: 12px 18px;
-    margin: 8px 0;
-    max-width: 85%;
-    line-height: 1.5;
-    font-size: 16px;
-}
-
-/* User message bubble */
-.chat-message.user {
-    background-color: #FF4C4C;
-    color: white;
-    margin-left: auto;
-    text-align: right;
-    box-shadow: 0 0 15px rgba(255,60,60,0.5);
-}
-
-/* Assistant message bubble */
-.chat-message.assistant {
-    background-color: #f5f5f5;
-    color: #222;
-    margin-right: auto;
-    text-align: left;
-    box-shadow: 0 0 15px rgba(255,255,255,0.2);
-}
-</style>
-""", unsafe_allow_html=True)
 elif menu == "💬 CPE Chatbot":
     st.header("💬 CPE Student ChatBot")
     st.markdown("Ask me anything about Computer Engineering 2nd Year!")
 
+    # --- Chatbot Styling ---
+    st.markdown("""
+    <style>
+    /* Chat container */
+    .chat-message {
+        border-radius: 12px;
+        padding: 12px 18px;
+        margin: 8px 0;
+        max-width: 85%;
+        line-height: 1.5;
+        font-size: 16px;
+    }
+
+    /* User message bubble */
+    .chat-message.user {
+        background-color: #FF4C4C;
+        color: white;
+        margin-left: auto;
+        text-align: right;
+        box-shadow: 0 0 15px rgba(255,60,60,0.5);
+    }
+
+    /* Assistant message bubble */
+    .chat-message.assistant {
+        background-color: #f5f5f5;
+        color: #222;
+        margin-right: auto;
+        text-align: left;
+        box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # --- Chatbot Logic ---
     user_input = st.text_input("You:", placeholder="e.g., Where is Prof Acob office?")
+
     responses = {
         "teacher": "Most CPE professors can be found in the CICS, CPE Faculty 2nd floor.",
-        "prof acob": "Proffesor Acob usually handles computer related courses and can be found in CICS or in CPE Lab.",
+        "prof acob": "Professor Acob usually handles computer-related courses and can be found in CICS or in the CPE Lab.",
         "engr de los reyes": "Engr. De los Reyes often teaches on the 4th floor CEAF Building — check the Circuit Lab.",
         "class schedule": "CPE 2nd year usually has major subjects from 8:00 AM to 5:00 PM.",
         "project": "Major projects are often submitted through Google Classroom or the department office.",
@@ -423,7 +427,7 @@ elif menu == "💬 CPE Chatbot":
                 break
 
         st.markdown(f'<div class="chat-message user">{user_input}</div>', unsafe_allow_html=True)
-st.markdown(f'<div class="chat-message assistant">{response}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="chat-message assistant">{response}</div>', unsafe_allow_html=True)
 
 
 # -------------------- ABOUT --------------------
@@ -439,6 +443,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
