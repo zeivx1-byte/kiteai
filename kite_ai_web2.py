@@ -60,13 +60,79 @@ st.markdown("""
 
 # --- Header Section ---
 st.markdown("""
-<div style='text-align:center;'>
-    <h1 style='font-size:45px; color:#00E0FF;'>KITE-AI Web 2.0</h1>
-    <h3 style='color:#BBBBBB;'>Computer Engineering Smart Assistant</h3>
-    <p style='color:gray;'>A fusion of Engineering Calculators, AI Simulations, and Student Utilities</p>
-    <hr style='border: 1px solid rgba(0,224,255,0.3); width:80%; margin:auto;'>
-</div>
+    <style>
+        /* === GLOBAL BACKGROUND === */
+        [data-testid="stAppViewContainer"] {
+            background: radial-gradient(circle at top left, #120000 0%, #1a0000 50%, #0b0000 100%);
+            color: #ffffff !important;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* === SIDEBAR === */
+        [data-testid="stSidebar"] {
+            background: rgba(30, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(255, 50, 50, 0.2);
+        }
+
+        /* === HEADINGS === */
+        h1, h2, h3, h4 {
+            color: #FF4C4C !important;
+            text-shadow: 0 0 25px rgba(255, 60, 60, 0.5);
+        }
+
+        /* === BUTTONS === */
+        button[kind="primary"] {
+            background: linear-gradient(135deg, #B00000, #FF0000);
+            color: white !important;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 0 15px rgba(255, 60, 60, 0.3);
+            transition: all 0.2s ease-in-out;
+        }
+
+        button[kind="primary"]:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
+        }
+
+        button {
+            background-color: rgba(40, 0, 0, 0.8) !important;
+            color: #FF4C4C !important;
+            border: 1px solid rgba(255, 50, 50, 0.4);
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: rgba(70, 0, 0, 0.9) !important;
+            box-shadow: 0 0 20px rgba(255, 60, 60, 0.4);
+        }
+
+        /* === SIDEBAR TITLE === */
+        [data-testid="stSidebarNav"]::before {
+            content: "🔥 KITE-AI SYSTEM";
+            margin-left: 15px;
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #FF4C4C;
+            text-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
+        }
+
+        /* === INPUTS, BOXES, AND TEXT AREAS === */
+        .stMarkdown, .stTextInput, .stNumberInput, .stSelectbox, .stTextArea {
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 10px;
+            color: #fff !important;
+        }
+
+        /* === FOOTER === */
+        footer {visibility: hidden;}
+    </style>
 """, unsafe_allow_html=True)
+
 
 # --- Sidebar Menu ---
 menu = st.sidebar.radio(
@@ -342,5 +408,6 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
