@@ -8,22 +8,27 @@ import os
 
 # --- Modern Sophisticated UI Theme ---
 st.set_page_config(page_title="KITE-AI Web 2.0", page_icon="🤖", layout="wide")
-# --- Header Image ---
-header_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/568672685_718166897320759_4217860298229868715_n.jpg"
+# --- Small Header Icon ---
+icon_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/568672685_718166897320759_4217860298229868715_n.jpg"
 
 st.markdown(f"""
-    <div style='
-        width: 100%;
-        height: 130px;
-        background-image: url("{header_url}");
-        background-size: cover;
-        background-position: center;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        box-shadow: 0 0 20px rgba(255, 60, 60, 0.4);
-    '>
+    <div style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: 5px;
+        padding-bottom: 10px;
+    ">
+        <img src="{icon_url}" style="
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255,60,60,0.5);
+            border: 2px solid rgba(255,255,255,0.3);
+        ">
     </div>
 """, unsafe_allow_html=True)
+
 
 # === GLOBAL THEME (Dark Neon Style + Red Header) ===
 st.markdown("""
@@ -401,5 +406,6 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
