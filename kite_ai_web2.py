@@ -78,90 +78,83 @@ menu = st.sidebar.radio(
 
 # -------------------- HOME --------------------
 # -------------------- HOME (Enhanced Web Layout) --------------------
-if menu == "🏠 Home":
-    st.markdown("""
-    <style>
-    .hero {
-        position: relative;
-        background-image: url('https://upload.wikimedia.org/wikipedia/commons/4/4c/Batangas_State_University_Main_Campus.jpg');
-        background-size: cover;
-        background-position: center;
-        height: 550px;
-        border-radius: 15px;
-        text-align: center;
-        color: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        box-shadow: 0 0 30px rgba(0,224,255,0.3);
-    }
-    .overlay {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,20,0.6);
-        border-radius: 15px;
-    }
-    .hero-content {
-        position: relative;
-        z-index: 1;
-        padding: 20px;
-    }
-    .hero h1 {
-        font-size: 55px;
-        font-weight: 800;
-        color: #00E0FF;
-        text-shadow: 0 0 25px rgba(0,224,255,0.7);
-        margin-bottom: 10px;
-    }
-    .hero h3 {
-        font-size: 22px;
-        background: rgba(0, 194, 255, 0.8);
-        display: inline-block;
-        padding: 10px 25px;
-        border-radius: 10px;
-        color: white;
-        font-weight: 600;
-        box-shadow: 0 0 20px rgba(0,224,255,0.4);
-    }
-    .features {
-        text-align: center;
-        margin-top: 40px;
-    }
-    .features h2 {
-        color: #00E0FF;
-        text-shadow: 0 0 15px rgba(0,224,255,0.5);
-    }
-    .features ul {
-        list-style: none;
-        padding: 0;
-        font-size: 18px;
-        color: #CCCCCC;
-    }
-    .features li {
-        margin: 10px 0;
-    }
-    </style>
+import base64
 
-    <div class="hero">
-        <div class="overlay"></div>
-        <div class="hero-content">
-            <h1>WELCOME TO THE KITE WEB COMPANION</h1>
-            <h3>Empowering Computer Engineering Students with Essential Tools</h3>
-        </div>
-    </div>
+# --- Load BSU banner image from local path ---
+image_path = r"C:\Users\Vinz Mannu Ramos\Downloads\BSU.jpg"
 
-    <div class="features">
-        <h2>🧠 Explore KITE-AI Features</h2>
-        <ul>
-            <li>⚙️ Physics & Engineering Calculators</li>
-            <li>🔌 Electrical Circuit Assistant</li>
-            <li>📏 Unit Converter</li>
-            <li>🗂️ Task Manager</li>
-            <li>💬 CPE Chatbot Assistant</li>
-        </ul>
+def get_base64_image(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
+if os.path.exists(image_path):
+    encoded_img = get_base64_image(image_path)
+    bg_url = f"data:image/jpeg;base64,{encoded_img}"
+else:
+    # fallback if file not found
+    bg_url = "https://upload.wikimedia.org/wikipedia/commons/4/4c/Batangas_State_University_Main_Campus.jpg"
+
+
+# --- Apply Custom Hero Banner Style ---
+st.markdown(f"""
+<style>
+.hero {{
+    position: relative;
+    background-image: url("{bg_url}");
+    background-size: cover;
+    background-position: center;
+    height: 550px;
+    border-radius: 15px;
+    text-align: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 0 30px rgba(0,224,255,0.3);
+}}
+.overlay {{
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,20,0.6);
+    border-radius: 15px;
+}}
+.hero-content {{
+    position: relative;
+    z-index: 1;
+    padding: 20px;
+}}
+.hero h1 {{
+    font-size: 55px;
+    font-weight: 800;
+    color: #00E0FF;
+    text-shadow: 0 0 25px rgba(0,224,255,0.7);
+    margin-bottom: 10px;
+}}
+.hero h3 {{
+    font-size: 22px;
+    background: rgba(0, 194, 255, 0.8);
+    display: inline-block;
+    padding: 10px 25px;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 0 20px rgba(0,224,255,0.4);
+}}
+</style>
+""", unsafe_allow_html=True)
+
+
+# --- Hero Section Content ---
+st.markdown("""
+<div class="hero">
+    <div class="overlay"></div>
+    <div class="hero-content">
+        <h1>WELCOME TO THE KITE WEB COMPANION</h1>
+        <h3>Empowering Computer Engineering Students with Essential Tools</h3>
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
 
 # -------------------- TASK MANAGER --------------------
@@ -360,6 +353,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
