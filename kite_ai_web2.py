@@ -90,6 +90,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+
         /* === SIDEBAR === */
         [data-testid="stSidebar"] {
             background: rgba(30, 0, 0, 0.8);
@@ -430,6 +431,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
