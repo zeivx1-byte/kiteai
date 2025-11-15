@@ -368,8 +368,9 @@ elif menu == "💬 CPE Chatbot":
     import json
     import time
     import requests
-    import os
     from difflib import get_close_matches
+    import streamlit as st
+    import os
 
     st.header("💬 CPE Student ChatBot")
     st.markdown("Ask me anything about Computer Engineering 2nd Year!")
@@ -415,7 +416,6 @@ elif menu == "💬 CPE Chatbot":
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
     if "api_cache" not in st.session_state:
-        # Load persistent cache
         if os.path.exists(cache_file):
             with open(cache_file, "r") as f:
                 st.session_state.api_cache = json.load(f)
@@ -439,43 +439,48 @@ elif menu == "💬 CPE Chatbot":
                 response_text = st.session_state.api_cache[user_input]
             else:
                 # --- OpenRouter API call with retry ---
-                OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "your_api_key_here")
-                headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
-                payload = {
-                    "model": "meta-llama/llama-2-7b-chat:free",  # Known-free model
-                    "messages": [
-                        {"role": "system", "content": 
-                         "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
-                        {"role": "user", "content": user_input}
-                    ]
-                }
+                try:
+                    OPENROUTER_API_KEY = st.secrets["openrouter"]["api_key"]
+                except Exception:
+                    st.error("⚠️ OpenRouter API key not found in st.secrets!")
+                    OPENROUTER_API_KEY = None
 
-                for attempt in range(2):  # retry once
-                    try:
-                        with st.spinner("KITE-AI is thinking..."):
-                            response = requests.post(
-                                "https://openrouter.ai/api/v1/chat/completions",
-                                headers=headers,
-                                json=payload,
-                                timeout=30  # increased timeout
-                            )
-                            response.raise_for_status()
-                            data = response.json()
-                            response_text = data["choices"][0]["message"]["content"]
+                if OPENROUTER_API_KEY:
+                    headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
+                    payload = {
+                        "model": "meta-llama/llama-2-7b-chat:free",  # Known-free model
+                        "messages": [
+                            {"role": "system", "content": 
+                             "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
+                            {"role": "user", "content": user_input}
+                        ]
+                    }
 
-                            # Save to session cache
-                            st.session_state.api_cache[user_input] = response_text
-                            # Save persistent cache
-                            with open(cache_file, "w") as f:
-                                json.dump(st.session_state.api_cache, f, indent=2)
-                            break
-                    except requests.exceptions.RequestException as e:
-                        if attempt == 0:
-                            time.sleep(2)
-                        else:
-                            response_text = f"⚠️ OpenRouter request failed: {e}\nYou can still ask about professors."
-                    except Exception as e:
-                        response_text = f"⚠️ Unexpected error: {e}"
+                    for attempt in range(2):  # retry once
+                        try:
+                            with st.spinner("KITE-AI is thinking..."):
+                                response = requests.post(
+                                    "https://openrouter.ai/api/v1/chat/completions",
+                                    headers=headers,
+                                    json=payload,
+                                    timeout=30
+                                )
+                                response.raise_for_status()
+                                data = response.json()
+                                response_text = data["choices"][0]["message"]["content"]
+
+                                # Save session & persistent cache
+                                st.session_state.api_cache[user_input] = response_text
+                                with open(cache_file, "w") as f:
+                                    json.dump(st.session_state.api_cache, f, indent=2)
+                                break
+                        except requests.exceptions.RequestException as e:
+                            if attempt == 0:
+                                time.sleep(2)
+                            else:
+                                response_text = f"⚠️ OpenRouter request failed: {e}\nYou can still ask about professors."
+                        except Exception as e:
+                            response_text = f"⚠️ Unexpected error: {e}"
 
         # --- Save chat history ---
         st.session_state.chat_history.append({"role": "user", "content": user_input})
@@ -485,6 +490,7 @@ elif menu == "💬 CPE Chatbot":
     for msg in st.session_state.chat_history:
         role_class = "user" if msg["role"]=="user" else "assistant"
         st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html=True)
+
 
 
 # -------------------- ABOUT --------------------
@@ -500,6 +506,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
