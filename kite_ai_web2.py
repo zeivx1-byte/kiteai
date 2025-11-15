@@ -401,21 +401,33 @@ for attempt in range(2):  # retry once
     except Exception as e:
         response_text = f"⚠️ Unexpected error: {e}"
 
-
-
 # -------------------- ABOUT --------------------
 elif menu == "📘 About":
     st.header("📘 About KITE-AI Web 2.0")
     st.markdown("""
-    **Developed for:** Computer Engineering 2nd Year  
-    **Purpose:** To integrate Engineering problem-solving and basic AI simulations  
-    **Modules Included:**  
-    - Task Manager  
-    - Physics & Electrical Calculators  
-    - Unit Converters  
-    - AI Demos (Logic Gates, Perceptron)  
-    - Student Chatbot  
-    """)
+    <div style="
+        background: rgba(40,0,0,0.6); 
+        padding: 20px; 
+        border-radius: 15px; 
+        box-shadow: 0 0 25px rgba(255,60,60,0.3);
+        color: #FFEAEA;
+        font-size: 16px;
+        line-height: 1.6;
+    ">
+    <strong>Developed for:</strong> Computer Engineering 2nd Year<br>
+    <strong>Purpose:</strong> To integrate Engineering problem-solving and basic AI simulations<br>
+    <strong>Modules Included:</strong>
+    <ul>
+        <li>Task Manager</li>
+        <li>Physics & Electrical Calculators</li>
+        <li>Unit Converters</li>
+        <li>AI Demos (Logic Gates, Perceptron)</li>
+        <li>Student Chatbot</li>
+    </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
+
 
 
 
