@@ -362,139 +362,135 @@ elif menu == "🔌 Electrical Assistant":
             except:
                 st.error("Invalid input.")
 
-# -------------------- CPE CHATBOT --------------------
-elif menu == "💬 CPE Chatbot":
-    import json
-    import time
-    import requests
-    from difflib import get_close_matches
-    import streamlit as st
-    import os
+# -------------------- STUDENT CHATBOT --------------------
+elif menu == "🤖 Student Chatbot":
+    st.header("🤖 KITE-AI Student Chatbot")
 
-    st.header("💬 CPE Student ChatBot")
-    st.markdown("Ask me anything about Computer Engineering 2nd Year!")
-
-    # --- Chatbot Styling ---
-    st.markdown("""
-    <style>
-    .chat-message {
-        border-radius: 12px;
-        padding: 12px 18px;
-        margin: 8px 0;
-        max-width: 85%;
-        line-height: 1.5;
-        font-size: 16px;
-    }
-    .chat-message.user {
-        background-color: #FF4C4C;
-        color: white;
-        margin-left: auto;
-        text-align: right;
-        box-shadow: 0 0 15px rgba(255,60,60,0.5);
-    }
-    .chat-message.assistant {
-        background-color: #f5f5f5;
-        color: #222;
-        margin-right: auto;
-        text-align: left;
-        box-shadow: 0 0 15px rgba(255,255,255,0.2);
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    st.markdown("Ask anything about professors, schedules, engineering topics, or general questions.")
 
     # --- Teacher Database ---
     teachers_info = {
-        # 2101
-        "prof jennifer l. marasigan": {"name": "Prof. Jennifer L. Marasigan", "subject": "CpE 403 - Computer Engineering as a Discipline", "office": "CICS 2nd Flr"},
-        "prof christia a. manalo": {"name": "Prof. Christia A. Manalo", "subject": "ENGG 403 - Computer-Aided Design", "office": "AEB 4th Flr"},
-        "prof maria carmela m. carandang": {"name": "Prof. Maria Carmela M. Carandang", "subject": "PATHFit 3 - Traditional and Recreational Games", "office": "FDC 103"},
-        "prof giovanni c. sarcilla": {"name": "Prof. Giovanni C. Sarcilla", "subject": "ENGG 404 - Engineering Economics", "office": "AEB 2nd Flr"},
-        "prof monique a. coliat": {"name": "Prof. Monique A. Coliat", "subject": "EE 423 - Fundamentals of Electrical Engineering", "office": "AEB 4th Flr"},
-        "prof joyce ann g. acob": {"name": "Prof. Joyce Ann G. Acob", "subject": "CpE 404 - Programming Logic and Design", "office": "CICS 2nd Flr"},
-        "prof mercedita d. ocampo": {"name": "Prof. Mercedita D. Ocampo", "subject": "CpE 405 - Discrete Mathematics", "office": "CICS 2nd Flr"},
-        "prof jhon kenneth a. de los reyes": {"name": "Prof. Jhon Kenneth A. De Los Reyes", "subject": "MATH 403 - Engineering Data Analysis", "office": "AEB 4th Flr"},
-        "prof charley b. leuterio": {"name": "Prof. Charley B. Leuterio", "subject": "MATH 404 - Differential Equations", "office": "AEB 4th Flr"},
+        "prof jennifer l. marasigan": {
+            "name": "Prof. Jennifer L. Marasigan",
+            "subject": "CpE 403 - Computer Engineering as a Discipline",
+            "office": "CICS 2nd Flr"
+        },
+        "prof christia a. manalo": {
+            "name": "Prof. Christia A. Manalo",
+            "subject": "ENGG 403 - Computer-Aided Design",
+            "office": "AEB 4th Flr"
+        },
+        "prof maria carmela m. carandang": {
+            "name": "Prof. Maria Carmela M. Carandang",
+            "subject": "PATHFit 3 - Traditional and Recreational Games",
+            "office": "FDC 103"
+        },
+        "prof giovanni c. sarcilla": {
+            "name": "Prof. Giovanni C. Sarcilla",
+            "subject": "ENGG 404 - Engineering Economics",
+            "office": "AEB 2nd Flr"
+        },
+        "prof monique a. coliat": {
+            "name": "Prof. Monique A. Coliat",
+            "subject": "EE 423 - Fundamentals of Electrical Engineering",
+            "office": "AEB 4th Flr"
+        },
+        "prof joyce ann g. acob": {
+            "name": "Prof. Joyce Ann G. Acob",
+            "subject": "CpE 404 - Programming Logic and Design",
+            "office": "CICS 2nd Flr"
+        },
+        "prof mercedita d. ocampo": {
+            "name": "Prof. Mercedita D. Ocampo",
+            "subject": "CpE 405 - Discrete Mathematics",
+            "office": "CICS 2nd Flr"
+        },
+        "prof jhon kenneth a. de los reyes": {
+            "name": "Prof. Jhon Kenneth A. De Los Reyes",
+            "subject": "MATH 403 - Engineering Data Analysis",
+            "office": "AEB 4th Flr"
+        },
+        "prof charley b. leuterio": {
+            "name": "Prof. Charley B. Leuterio",
+            "subject": "MATH 404 - Differential Equations",
+            "office": "AEB 4th Flr"
+        },
         # 2105
-        "prof malvin roix orense": {"name": "Prof. Malvin Roix Orense", "subject": "ENGG 404 - Engineering Economics", "office": "TBA"},
-        "prof anthony hernandez": {"name": "Prof. Anthony Hernandez", "subject": "CpE 404 - Programming Logic and Design", "office": "TBA"},
-        "prof kristine bejasa": {"name": "Prof. Kristine Bejasa", "subject": "EE 423 - Fundamentals of Electrical Engineering", "office": "TBA"},
-        "prof laila hernandez": {"name": "Prof. Laila Hernandez", "subject": "CpE 403 - Computer Engineering as a Discipline", "office": "TBA"},
-        "prof ericka vabes ruolda": {"name": "Prof. Ericka Vabes Ruolda", "subject": "ENGG 403 - Computer-Aided Design", "office": "TBA"},
-        "prof ryan banua": {"name": "Prof. Ryan Banua", "subject": "MATH 403 - Engineering Data Analysis", "office": "TBA"}
+        "prof malvin roix orense": {
+            "name": "Prof. Malvin Roix Orense",
+            "subject": "ENGG 404 - Engineering Economics",
+            "office": "TBA"
+        },
+        "prof anthony hernandez": {
+            "name": "Prof. Anthony Hernandez",
+            "subject": "CpE 404 - Programming Logic and Design",
+            "office": "TBA"
+        },
+        "prof kristine bejasa": {
+            "name": "Prof. Kristine Bejasa",
+            "subject": "EE 423 - Fundamentals of Electrical Engineering",
+            "office": "TBA"
+        },
+        "prof laila hernandez": {
+            "name": "Prof. Laila Hernandez",
+            "subject": "CpE 403 - Computer Engineering as a Discipline",
+            "office": "TBA"
+        },
+        "prof ericka vabes ruolda": {
+            "name": "Prof. Ericka Vabes Ruolda",
+            "subject": "ENGG 403 - Computer-Aided Design",
+            "office": "TBA"
+        },
+        "prof ryan banua": {
+            "name": "Prof. Ryan Banua",
+            "subject": "MATH 403 - Engineering Data Analysis",
+            "office": "TBA"
+        }
     }
 
-    # --- Persistent cache ---
-    cache_file = "chat_cache.json"
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
-    if "api_cache" not in st.session_state:
-        if os.path.exists(cache_file):
-            with open(cache_file, "r") as f:
-                st.session_state.api_cache = json.load(f)
-        else:
-            st.session_state.api_cache = {}
-
-    # --- User input ---
-    user_input = st.text_input("You:", placeholder="Ask something...")
+    # --- User Input ---
+    user_input = st.text_input("Ask something:")
 
     if user_input:
-        response_text = "🤔 I'm not sure yet. You can ask your class representative."
 
-        # --- Check teacher database first ---
-        closest = get_close_matches(user_input.lower(), teachers_info.keys(), n=1, cutoff=0.6)
-        if closest:
-            info = teachers_info[closest[0]]
-            response_text = f"**{info['name']}**\nSubject: {info['subject']}\nOffice: {info['office']}"
+        # Check if asking about teacher
+        key = user_input.lower().strip()
+        if key in teachers_info:
+            info = teachers_info[key]
+            st.success(f"**{info['name']}**\n\n**Subject:** {info['subject']}\n**Office:** {info['office']}")
         else:
-            # --- Check persistent cache ---
-            if user_input in st.session_state.api_cache:
-                response_text = st.session_state.api_cache[user_input]
-            else:
-                # --- Hardcoded working OpenRouter API key ---
-                OPENROUTER_API_KEY = "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"
-                headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
+            try:
+                import requests
+                import streamlit as st
+                import os
+
+                api_key = st.secrets["OPENROUTER_API_KEY"]
+
+                headers = {
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json"
+                }
+
                 payload = {
-                    "model": "qwen/qwen3-coder:free",
+                    "model": "tngtech/deepseek-r1t2-chimera:free",
                     "messages": [
-                        {"role": "system", "content": "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
+                        {"role": "system", "content": "You are KITE-AI, a helpful engineering student assistant."},
                         {"role": "user", "content": user_input}
                     ]
                 }
 
-                for attempt in range(2):
-                    try:
-                        with st.spinner("KITE-AI is thinking..."):
-                            response = requests.post(
-                                "https://openrouter.ai/api/v1/chat/completions",
-                                headers=headers,
-                                json=payload,
-                                timeout=30
-                            )
-                            response.raise_for_status()
-                            data = response.json()
-                            response_text = data["choices"][0]["message"]["content"]
+                url = "https://openrouter.ai/api/v1/chat/completions"
+                response = requests.post(url, headers=headers, json=payload)
 
-                            # Save session & persistent cache
-                            st.session_state.api_cache[user_input] = response_text
-                            with open(cache_file, "w") as f:
-                                json.dump(st.session_state.api_cache, f, indent=2)
-                            break
-                    except requests.exceptions.RequestException as e:
-                        if attempt == 0:
-                            time.sleep(2)
-                        else:
-                            response_text = f"⚠️ OpenRouter request failed: {e}\nYou can still ask about professors."
-                    except Exception as e:
-                        response_text = f"⚠️ Unexpected error: {e}"
+                if response.status_code == 200:
+                    bot_reply = response.json()["choices"][0]["message"]["content"]
+                    st.info(bot_reply)
+                else:
+                    st.error(f"⚠️ OpenRouter error: {response.status_code} - {response.text}")
 
-        # --- Save chat history ---
-        st.session_state.chat_history.append({"role": "user", "content": user_input})
-        st.session_state.chat_history.append({"role": "assistant", "content": response_text})
+            except Exception as e:
+                st.error(f"⚠️ Error: {e}")
 
-    # --- Display chat history ---
-    for msg in st.session_state.chat_history:
-        role_class = "user" if msg["role"]=="user" else "assistant"
-        st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html=True)
 
 
 
@@ -524,6 +520,7 @@ elif menu == "📘 About":
     </ul>
     </div>
     """, unsafe_allow_html=True)
+
 
 
 
