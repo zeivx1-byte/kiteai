@@ -5,83 +5,91 @@
 import streamlit as st
 import numpy as np
 import os
-import json
-import time
-import requests
-from difflib import get_close_matches
 
-# --- Page Setup ---
+# --- Modern Sophisticated UI Theme ---
 st.set_page_config(page_title="KITE-AI Web 2.0", page_icon="🤖", layout="wide")
-
-# --- Header Icon ---
+# --- Small Header Icon ---
 icon_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/568672685_718166897320759_4217860298229868715_n.jpg"
+
 st.markdown(f"""
-<div style="
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 5px;
-    padding-bottom: 10px;
-">
-    <img src="{icon_url}" style="
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        box-shadow: 0 0 15px rgba(255,60,60,0.5);
-        border: 2px solid rgba(255,255,255,0.3);
+    <div style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: 5px;
+        padding-bottom: 10px;
     ">
-</div>
+        <img src="{icon_url}" style="
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255,60,60,0.5);
+            border: 2px solid rgba(255,255,255,0.3);
+        ">
+    </div>
 """, unsafe_allow_html=True)
 
-# --- Global Dark-Red Neon Theme ---
+
+# === GLOBAL THEME (Dark Neon Style + Red Header) ===
 st.markdown("""
 <style>
+/* === GLOBAL BACKGROUND === */
 [data-testid="stAppViewContainer"] {
     background: radial-gradient(circle at top left, #0a0a0f 0%, #101520 60%, #0b0c10 100%);
     color: white !important;
     font-family: 'Segoe UI', sans-serif;
 }
+
+/* === HEADER FIX === */
 header[data-testid="stHeader"] {
     background: linear-gradient(90deg, #2b0000, #4a0000, #2b0000);
     color: #FF4C4C !important;
     box-shadow: 0 0 25px rgba(255, 60, 60, 0.3);
     border-bottom: 1px solid rgba(255, 80, 80, 0.4);
 }
+
+/* === SIDEBAR === */
 [data-testid="stSidebar"] {
-    background: rgba(30,0,0,0.8);
+    background: rgba(30, 0, 0, 0.8);
     backdrop-filter: blur(15px);
-    border-right: 1px solid rgba(255,50,50,0.2);
+    border-right: 1px solid rgba(255, 50, 50, 0.2);
 }
 [data-testid="stSidebar"] * {
     color: #FFD6D6 !important;
 }
-h1,h2,h3,h4 {
+
+/* === HEADINGS === */
+h1, h2, h3, h4 {
     color: #FF4C4C !important;
-    text-shadow: 0 0 25px rgba(255,60,60,0.5);
+    text-shadow: 0 0 25px rgba(255, 60, 60, 0.5);
 }
+
+/* === BUTTONS === */
 button[kind="primary"] {
     background: linear-gradient(135deg, #B00000, #FF0000);
     color: white !important;
     border-radius: 12px;
     border: none;
-    box-shadow: 0 0 15px rgba(255,60,60,0.3);
+    box-shadow: 0 0 15px rgba(255, 60, 60, 0.3);
     transition: all 0.2s ease-in-out;
 }
 button[kind="primary"]:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 25px rgba(255,80,80,0.6);
+    box-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
 }
 button {
-    background-color: rgba(40,0,0,0.8) !important;
+    background-color: rgba(40, 0, 0, 0.8) !important;
     color: #FF4C4C !important;
-    border: 1px solid rgba(255,50,50,0.4);
+    border: 1px solid rgba(255, 50, 50, 0.4);
     border-radius: 10px;
     transition: 0.3s;
 }
 button:hover {
-    background-color: rgba(70,0,0,0.9) !important;
-    box-shadow: 0 0 20px rgba(255,60,60,0.4);
+    background-color: rgba(70, 0, 0, 0.9) !important;
+    box-shadow: 0 0 20px rgba(255, 60, 60, 0.4);
 }
+
+/* === SIDEBAR TITLE === */
 [data-testid="stSidebarNav"]::before {
     content: "🔥 KITE-AI SYSTEM";
     margin-left: 15px;
@@ -89,8 +97,10 @@ button:hover {
     font-size: 20px;
     font-weight: 700;
     color: #FF4C4C;
-    text-shadow: 0 0 25px rgba(255,80,80,0.6);
+    text-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
 }
+
+/* === FOOTER HIDDEN === */
 footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
@@ -103,10 +113,12 @@ menu = st.sidebar.radio(
      "💬 CPE Chatbot", "📘 About"]
 )
 
-# ================= HOME =================
+# -------------------- HOME --------------------
+# -------------------- HOME --------------------
 if menu == "🏠 Home":
     bg_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/BSU.jpg"
 
+    # --- Hero Banner ---
     st.markdown(f"""
     <style>
     .hero {{
@@ -143,7 +155,7 @@ if menu == "🏠 Home":
     }}
     .hero h3 {{
         font-size: 22px;
-        background: rgba(255,0,0,0.6);
+        background: rgba(255, 0, 0, 0.6);
         display: inline-block;
         padding: 10px 25px;
         border-radius: 10px;
@@ -154,9 +166,9 @@ if menu == "🏠 Home":
     .vision {{
         margin-top: 60px;
         padding: 30px;
-        background: rgba(40,0,0,0.6);
+        background: rgba(40, 0, 0, 0.6);
         border-radius: 15px;
-        box-shadow: 0 0 25px rgba(255,60,60,0.3);
+        box-shadow: 0 0 25px rgba(255, 60, 60, 0.3);
         text-align: center;
     }}
     .vision h2 {{
@@ -175,6 +187,7 @@ if menu == "🏠 Home":
     </style>
     """, unsafe_allow_html=True)
 
+    # --- Hero Section ---
     st.markdown("""
     <div class="hero">
         <div class="overlay"></div>
@@ -185,6 +198,7 @@ if menu == "🏠 Home":
     </div>
     """, unsafe_allow_html=True)
 
+    # --- VISION Section ---
     st.markdown("""
     <div class="vision">
         <h2>Our VISION</h2>
@@ -197,21 +211,22 @@ if menu == "🏠 Home":
     </div>
     """, unsafe_allow_html=True)
 
-# ================= TASK MANAGER =================
+# -------------------- TASK MANAGER --------------------
 elif menu == "🗂️ Task Manager":
     st.header("🗂️ Task Manager")
+
     task_file = "tasks.txt"
 
     def load_tasks():
         if os.path.exists(task_file):
-            with open(task_file,"r") as f:
+            with open(task_file, "r") as f:
                 return [line.strip() for line in f.readlines()]
         return []
 
     def save_tasks(tasks):
-        with open(task_file,"w") as f:
+        with open(task_file, "w") as f:
             for t in tasks:
-                f.write(t+"\n")
+                f.write(t + "\n")
 
     tasks = load_tasks()
     new_task = st.text_input("Add new task:")
@@ -225,8 +240,8 @@ elif menu == "🗂️ Task Manager":
 
     if tasks:
         st.subheader("Your Tasks:")
-        for i,t in enumerate(tasks):
-            col1,col2 = st.columns([5,1])
+        for i, t in enumerate(tasks):
+            col1, col2 = st.columns([5, 1])
             with col1:
                 st.write(f"{i+1}. {t}")
             with col2:
@@ -237,7 +252,7 @@ elif menu == "🗂️ Task Manager":
     else:
         st.info("No tasks added yet.")
 
-# ================= PHYSICS CALCULATOR =================
+# -------------------- PHYSICS CALCULATOR --------------------
 elif menu == "⚙️ Physics Calculator":
     st.header("⚙️ Physics Calculator")
     options = st.selectbox("Choose a formula:", [
@@ -252,95 +267,114 @@ elif menu == "⚙️ Physics Calculator":
         m = st.number_input("Mass (kg)", 0.0)
         a = st.number_input("Acceleration (m/s²)", 0.0)
         if st.button("Compute Force"):
-            st.success(f"Force = {m*a:.2f} N")
+            st.success(f"Force = {m * a:.2f} N")
 
     elif options == "Work (W = F * d)":
-        F = st.number_input("Force (N)",0.0)
-        d = st.number_input("Distance (m)",0.0)
+        F = st.number_input("Force (N)", 0.0)
+        d = st.number_input("Distance (m)", 0.0)
         if st.button("Compute Work"):
-            st.success(f"Work = {F*d:.2f} J")
+            st.success(f"Work = {F * d:.2f} J")
 
     elif options == "Power (P = W / t)":
-        W = st.number_input("Work (J)",0.0)
-        t = st.number_input("Time (s)",0.0)
+        W = st.number_input("Work (J)", 0.0)
+        t = st.number_input("Time (s)", 0.0)
         if st.button("Compute Power"):
-            if t != 0: st.success(f"Power = {W/t:.2f} W")
-            else: st.error("Time cannot be zero.")
+            if t != 0:
+                st.success(f"Power = {W / t:.2f} W")
+            else:
+                st.error("Time cannot be zero.")
 
     elif options == "Kinetic Energy (KE = 0.5 * m * v²)":
-        m = st.number_input("Mass (kg)",0.0)
-        v = st.number_input("Velocity (m/s)",0.0)
+        m = st.number_input("Mass (kg)", 0.0)
+        v = st.number_input("Velocity (m/s)", 0.0)
         if st.button("Compute KE"):
-            st.success(f"Kinetic Energy = {0.5*m*v**2:.2f} J")
+            st.success(f"Kinetic Energy = {0.5 * m * v ** 2:.2f} J")
 
     elif options == "Potential Energy (PE = m * g * h)":
-        m = st.number_input("Mass (kg)",0.0)
-        g = st.number_input("Gravity (m/s²)",9.81)
-        h = st.number_input("Height (m)",0.0)
+        m = st.number_input("Mass (kg)", 0.0)
+        g = st.number_input("Gravity (m/s²)", 9.81)
+        h = st.number_input("Height (m)", 0.0)
         if st.button("Compute PE"):
-            st.success(f"Potential Energy = {m*g*h:.2f} J")
+            st.success(f"Potential Energy = {m * g * h:.2f} J")
 
-# ================= UNIT CONVERTER =================
+# -------------------- UNIT CONVERTER --------------------
 elif menu == "📏 Unit Converter":
     st.header("📏 Unit Converter")
-    conv_type = st.selectbox("Select Conversion Type:",[
+    conv_type = st.selectbox("Select Conversion Type:", [
         "Length (m ↔ ft)",
         "Mass (kg ↔ lb)",
         "Temperature (°C ↔ °F)",
         "Speed (km/h ↔ mph)"
     ])
-    if conv_type == "Length (m ↔ ft)":
-        m = st.number_input("Meters",0.0)
-        st.write(f"{m} m = {m*3.28084:.2f} ft")
-    elif conv_type == "Mass (kg ↔ lb)":
-        kg = st.number_input("Kilograms",0.0)
-        st.write(f"{kg} kg = {kg*2.20462:.2f} lb")
-    elif conv_type == "Temperature (°C ↔ °F)":
-        c = st.number_input("Temperature (°C)",0.0)
-        st.write(f"{c}°C = {(c*9/5)+32:.2f}°F")
-    elif conv_type == "Speed (km/h ↔ mph)":
-        kmh = st.number_input("Speed (km/h)",0.0)
-        st.write(f"{kmh} km/h = {kmh*0.621371:.2f} mph")
 
-# ================= ELECTRICAL ASSISTANT =================
+    if conv_type == "Length (m ↔ ft)":
+        m = st.number_input("Meters", 0.0)
+        st.write(f"{m} m = {m * 3.28084:.2f} ft")
+
+    elif conv_type == "Mass (kg ↔ lb)":
+        kg = st.number_input("Kilograms", 0.0)
+        st.write(f"{kg} kg = {kg * 2.20462:.2f} lb")
+
+    elif conv_type == "Temperature (°C ↔ °F)":
+        c = st.number_input("Temperature (°C)", 0.0)
+        st.write(f"{c}°C = {(c * 9/5) + 32:.2f}°F")
+
+    elif conv_type == "Speed (km/h ↔ mph)":
+        kmh = st.number_input("Speed (km/h)", 0.0)
+        st.write(f"{kmh} km/h = {kmh * 0.621371:.2f} mph")
+
+# -------------------- ELECTRICAL ASSISTANT --------------------
 elif menu == "🔌 Electrical Assistant":
     st.header("🔌 Electrical Circuit Assistant")
-    option = st.selectbox("Choose Calculation:",[
+    option = st.selectbox("Choose Calculation:", [
         "Ohm's Law (V = I * R)",
         "Power (P = V * I)",
         "Series Resistance",
         "Parallel Resistance"
     ])
+
     if option == "Ohm's Law (V = I * R)":
-        I = st.number_input("Current (A)",0.0)
-        R = st.number_input("Resistance (Ω)",0.0)
-        st.write(f"Voltage = {I*R:.2f} V")
+        I = st.number_input("Current (A)", 0.0)
+        R = st.number_input("Resistance (Ω)", 0.0)
+        st.write(f"Voltage = {I * R:.2f} V")
+
     elif option == "Power (P = V * I)":
-        V = st.number_input("Voltage (V)",0.0)
-        I = st.number_input("Current (A)",0.0)
-        st.write(f"Power = {V*I:.2f} W")
+        V = st.number_input("Voltage (V)", 0.0)
+        I = st.number_input("Current (A)", 0.0)
+        st.write(f"Power = {V * I:.2f} W")
+
     elif option == "Series Resistance":
-        r = st.text_input("Enter resistances (comma-separated)")
-        if r:
+        resistors = st.text_input("Enter resistances (comma-separated):")
+        if resistors:
             try:
-                st.success(f"Total = {sum([float(x) for x in r.split(',')]):.2f} Ω")
-            except:
-                st.error("Invalid input.")
-    elif option == "Parallel Resistance":
-        r = st.text_input("Enter resistances (comma-separated)")
-        if r:
-            try:
-                values = [float(x) for x in r.split(',') if float(x)!=0]
-                total = 1/sum(1/x for x in values)
-                st.success(f"Total = {total:.2f} Ω")
+                values = [float(r.strip()) for r in resistors.split(",")]
+                st.success(f"Total Resistance = {sum(values):.2f} Ω")
             except:
                 st.error("Invalid input.")
 
-# ================= CPE CHATBOT =================
+    elif option == "Parallel Resistance":
+        resistors = st.text_input("Enter resistances (comma-separated):")
+        if resistors:
+            try:
+                values = [float(r.strip()) for r in resistors.split(",")]
+                total = 1 / sum(1/r for r in values if r != 0)
+                st.success(f"Total Resistance = {total:.2f} Ω")
+            except:
+                st.error("Invalid input.")
+
+# -------------------- CPE CHATBOT --------------------
 elif menu == "💬 CPE Chatbot":
+    import json
+    import time
+    import requests
+    from difflib import get_close_matches
+    import streamlit as st
+    import os
+
     st.header("💬 CPE Student ChatBot")
     st.markdown("Ask me anything about Computer Engineering 2nd Year!")
 
+    # --- Chatbot Styling ---
     st.markdown("""
     <style>
     .chat-message {
@@ -370,6 +404,7 @@ elif menu == "💬 CPE Chatbot":
 
     # --- Teacher Database ---
     teachers_info = {
+        # 2101
         "prof jennifer l. marasigan": {"name": "Prof. Jennifer L. Marasigan", "subject": "CpE 403 - Computer Engineering as a Discipline", "office": "CICS 2nd Flr"},
         "prof christia a. manalo": {"name": "Prof. Christia A. Manalo", "subject": "ENGG 403 - Computer-Aided Design", "office": "AEB 4th Flr"},
         "prof maria carmela m. carandang": {"name": "Prof. Maria Carmela M. Carandang", "subject": "PATHFit 3 - Traditional and Recreational Games", "office": "FDC 103"},
@@ -378,60 +413,93 @@ elif menu == "💬 CPE Chatbot":
         "prof joyce ann g. acob": {"name": "Prof. Joyce Ann G. Acob", "subject": "CpE 404 - Programming Logic and Design", "office": "CICS 2nd Flr"},
         "prof mercedita d. ocampo": {"name": "Prof. Mercedita D. Ocampo", "subject": "CpE 405 - Discrete Mathematics", "office": "CICS 2nd Flr"},
         "prof jhon kenneth a. de los reyes": {"name": "Prof. Jhon Kenneth A. De Los Reyes", "subject": "MATH 403 - Engineering Data Analysis", "office": "AEB 4th Flr"},
-        "prof charley b. leuterio": {"name": "Prof. Charley B. Leuterio", "subject": "MATH 404 - Differential Equations", "office": "AEB 4th Flr"}
+        "prof charley b. leuterio": {"name": "Prof. Charley B. Leuterio", "subject": "MATH 404 - Differential Equations", "office": "AEB 4th Flr"},
+        # 2105
+        "prof malvin roix orense": {"name": "Prof. Malvin Roix Orense", "subject": "ENGG 404 - Engineering Economics", "office": "TBA"},
+        "prof anthony hernandez": {"name": "Prof. Anthony Hernandez", "subject": "CpE 404 - Programming Logic and Design", "office": "TBA"},
+        "prof kristine bejasa": {"name": "Prof. Kristine Bejasa", "subject": "EE 423 - Fundamentals of Electrical Engineering", "office": "TBA"},
+        "prof laila hernandez": {"name": "Prof. Laila Hernandez", "subject": "CpE 403 - Computer Engineering as a Discipline", "office": "TBA"},
+        "prof ericka vabes ruolda": {"name": "Prof. Ericka Vabes Ruolda", "subject": "ENGG 403 - Computer-Aided Design", "office": "TBA"},
+        "prof ryan banua": {"name": "Prof. Ryan Banua", "subject": "MATH 403 - Engineering Data Analysis", "office": "TBA"}
     }
 
-    # --- Persistent Cache ---
+    # --- Persistent cache ---
     cache_file = "chat_cache.json"
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
     if "api_cache" not in st.session_state:
         if os.path.exists(cache_file):
-            with open(cache_file,"r") as f:
+            with open(cache_file, "r") as f:
                 st.session_state.api_cache = json.load(f)
         else:
             st.session_state.api_cache = {}
 
-    # --- User Input ---
+    # --- User input ---
     user_input = st.text_input("You:", placeholder="Ask something...")
+
     if user_input:
         response_text = "🤔 I'm not sure yet. You can ask your class representative."
+
+        # --- Check teacher database first ---
         closest = get_close_matches(user_input.lower(), teachers_info.keys(), n=1, cutoff=0.6)
         if closest:
             info = teachers_info[closest[0]]
             response_text = f"**{info['name']}**\nSubject: {info['subject']}\nOffice: {info['office']}"
         else:
+            # --- Check persistent cache ---
             if user_input in st.session_state.api_cache:
                 response_text = st.session_state.api_cache[user_input]
             else:
+                # --- Hardcoded working OpenRouter API key ---
                 OPENROUTER_API_KEY = "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"
                 headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
-                payload = {"model":"qwen/qwen3-coder:free","messages":[{"role":"system","content":"You are KITE-AI, a friendly AI assistant for Computer Engineering students."},{"role":"user","content":user_input}]}
+                payload = {
+                    "model": "tngtech/deepseek-r1t2-chimera:free",
+                    "messages": [
+                        {"role": "system", "content": "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
+                        {"role": "user", "content": user_input}
+                    ]
+                }
+
                 for attempt in range(2):
                     try:
                         with st.spinner("KITE-AI is thinking..."):
-                            response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=30)
+                            response = requests.post(
+                                "https://openrouter.ai/api/v1/chat/completions",
+                                headers=headers,
+                                json=payload,
+                                timeout=30
+                            )
                             response.raise_for_status()
                             data = response.json()
                             response_text = data["choices"][0]["message"]["content"]
+
+                            # Save session & persistent cache
                             st.session_state.api_cache[user_input] = response_text
-                            with open(cache_file,"w") as f:
-                                json.dump(st.session_state.api_cache,f,indent=2)
+                            with open(cache_file, "w") as f:
+                                json.dump(st.session_state.api_cache, f, indent=2)
                             break
                     except requests.exceptions.RequestException as e:
-                        if attempt==0: time.sleep(2)
-                        else: response_text = f"⚠️ OpenRouter request failed: {e}\nYou can still ask about professors."
+                        if attempt == 0:
+                            time.sleep(2)
+                        else:
+                            response_text = f"⚠️ OpenRouter request failed: {e}\nYou can still ask about professors."
                     except Exception as e:
                         response_text = f"⚠️ Unexpected error: {e}"
 
-        st.session_state.chat_history.append({"role":"user","content":user_input})
-        st.session_state.chat_history.append({"role":"assistant","content":response_text})
+        # --- Save chat history ---
+        st.session_state.chat_history.append({"role": "user", "content": user_input})
+        st.session_state.chat_history.append({"role": "assistant", "content": response_text})
 
+    # --- Display chat history ---
     for msg in st.session_state.chat_history:
         role_class = "user" if msg["role"]=="user" else "assistant"
         st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html=True)
 
-# ================= ABOUT =================
+
+
+
+# -------------------- ABOUT --------------------
 elif menu == "📘 About":
     st.header("📘 About KITE-AI Web 2.0")
     st.markdown("""
@@ -445,7 +513,7 @@ elif menu == "📘 About":
         line-height: 1.6;
     ">
     <strong>Developed for:</strong> Computer Engineering 2nd Year<br>
-    <strong>Purpose:</strong> Integrate Engineering problem-solving and basic AI simulations<br>
+    <strong>Purpose:</strong> To integrate Engineering problem-solving and basic AI simulations<br>
     <strong>Modules Included:</strong>
     <ul>
         <li>Task Manager</li>
@@ -456,3 +524,32 @@ elif menu == "📘 About":
     </ul>
     </div>
     """, unsafe_allow_html=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
