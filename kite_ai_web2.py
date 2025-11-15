@@ -362,159 +362,285 @@ elif menu == "🔌 Electrical Assistant":
             except:
                 st.error("Invalid input.")
 
+# kite_ai_web2_fixed.py
+# KITE-AI Web 2.0 — Fixed full app (Option A: single hard-coded model)
+# Hard-coded OpenRouter key (as requested)
+# NOTE: Hard-coding API keys is insecure for public repos. Keep this file private.
+
 import streamlit as st
 import requests
+import json
+import time
+import os
+from difflib import get_close_matches
 
-# ------------------------------
-# STREAMLIT PAGE CONFIG
-# ------------------------------
-st.set_page_config(
-    page_title="KITE-AI Web 2.0",
-    page_icon="🤖",
-    layout="centered"
-)
+# ----------------------------
+# PAGE CONFIG
+# ----------------------------
+st.set_page_config(page_title="KITE-AI Web 2.0", page_icon="🤖", layout="wide")
 
-st.title("🤖 KITE-AI Web 2.0 — CPE Chatbot")
-st.write("AI-Powered Assistant with Faculty Search + OpenRouter Models")
+# ----------------------------
+# THEME / STYLES (dark red neon)
+# ----------------------------
+st.markdown("""
+<style>
+/* background */
+[data-testid="stAppViewContainer"] {
+    background: radial-gradient(circle at top left, #0a0a0f 0%, #101520 60%, #0b0c10 100%);
+    color: #FFEAEA;
+    font-family: 'Segoe UI', sans-serif;
+}
 
-# ------------------------------
-# HARD-CODED OPENROUTER API KEY
-# ------------------------------
+/* header */
+header[data-testid="stHeader"] { background: linear-gradient(90deg,#2b0000,#4a0000,#2b0000); color: #FF4C4C; }
+
+/* chat bubbles */
+.chat-box { padding: 12px 18px; margin: 8px 0; border-radius: 14px; max-width: 85%; font-size: 16px; line-height: 1.4; white-space: pre-wrap; }
+.user-msg { background-color: #B00000; color: white; margin-left: auto; text-align: right; }
+.bot-msg { background-color: #f5f5f5; color: #222; margin-right: auto; text-align: left; }
+
+/* chat container */
+.chat-container {
+    max-height: 520px;
+    overflow-y: auto;
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,60,60,0.08);
+}
+
+/* buttons */
+.stButton>button { border-radius: 10px; padding: 8px 14px; }
+</style>
+""", unsafe_allow_html=True)
+
+# ----------------------------
+# HARD-CODED OPENROUTER KEY & MODEL (Option A)
+# ----------------------------
 OPENROUTER_API_KEY = "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"
-
-HEADERS = {
+OPENROUTER_MODEL = "tngtech/deepseek-r1t2-chimera:free"
+OPENROUTER_HEADERS = {
     "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-    "Content-Type": "application/json",
+    "Content-Type": "application/json"
 }
 
-# ------------------------------
-# PROFESSOR DATABASE
-# ------------------------------
-professors = {
+# ----------------------------
+# APP LAYOUT
+# ----------------------------
+col1, col2 = st.columns([3, 1])
+
+with col1:
+    st.title("🤖 KITE-AI Web Companion")
+    st.subheader("CPE Student Assistant — Chatbot (fixed model)")
+    st.markdown("Ask about professors, engineering topics, or general questions. Professor info is available offline.")
+with col2:
+    st.markdown("**Model:**")
+    st.info(OPENROUTER_MODEL)
+
+# ----------------------------
+# TEACHER DATABASE (lookup keys are lowercase)
+# ----------------------------
+teachers_info = {
     # 2101
-    "Jennifer L. Marasigan": "CICS 2nd Flr",
-    "Christia A. Manalo": "AEB 4th Flr",
-    "Maria Carmela M. Carandang": "FDC 103",
-    "Giovanni C. Sarcilla": "AEB 2nd Flr",
-    "Monique A. Coliat": "AEB 4th Flr",
-    "Joyce Ann G. Acob": "CICS 2nd Flr",
-    "Mercedita D. Ocampo": "CICS 2nd Flr",
-    "Jhon Kenneth A. De Los Reyes": "AEB 4th Flr",
-    "Charley B. Leuterio": "AEB 4th Flr",
-
+    "prof jennifer l. marasigan": {"name": "Prof. Jennifer L. Marasigan", "subject": "CpE 403 - Computer Engineering as a Discipline", "office": "CICS 2nd Flr"},
+    "prof christia a. manalo": {"name": "Prof. Christia A. Manalo", "subject": "ENGG 403 - Computer-Aided Design", "office": "AEB 4th Flr"},
+    "prof maria carmela m. carandang": {"name": "Prof. Maria Carmela M. Carandang", "subject": "PATHFit 3 - Traditional and Recreational Games", "office": "FDC 103"},
+    "prof giovanni c. sarcilla": {"name": "Prof. Giovanni C. Sarcilla", "subject": "ENGG 404 - Engineering Economics", "office": "AEB 2nd Flr"},
+    "prof monique a. coliat": {"name": "Prof. Monique A. Coliat", "subject": "EE 423 - Fundamentals of Electrical Engineering", "office": "AEB 4th Flr"},
+    "prof joyce ann g. acob": {"name": "Prof. Joyce Ann G. Acob", "subject": "CpE 404 - Programming Logic and Design", "office": "CICS 2nd Flr"},
+    "prof mercedita d. ocampo": {"name": "Prof. Mercedita D. Ocampo", "subject": "CpE 405 - Discrete Mathematics", "office": "CICS 2nd Flr"},
+    "prof jhon kenneth a. de los reyes": {"name": "Prof. Jhon Kenneth A. De Los Reyes", "subject": "MATH 403 - Engineering Data Analysis", "office": "AEB 4th Flr"},
+    "prof charley b. leuterio": {"name": "Prof. Charley B. Leuterio", "subject": "MATH 404 - Differential Equations", "office": "AEB 4th Flr"},
     # 2105
-    "Malvin Roix Orense": "AEB Faculty Area",
-    "Anthony Hernandez": "CICS Faculty Area",
-    "Kristine Bejasa": "AEB Faculty Area",
-    "Laila Hernandez": "CICS Faculty Area",
-    "Ericka Vabes Ruolda": "AEB Faculty Area",
-    "Ryan Banua": "AEB Faculty Area",
+    "prof malvin roix orense": {"name": "Prof. Malvin Roix Orense", "subject": "ENGG 404 - Engineering Economics", "office": "TBA"},
+    "prof anthony hernandez": {"name": "Prof. Anthony Hernandez", "subject": "CpE 404 - Programming Logic and Design", "office": "TBA"},
+    "prof kristine bejasa": {"name": "Prof. Kristine Bejasa", "subject": "EE 423 - Fundamentals of Electrical Engineering", "office": "TBA"},
+    "prof laila hernandez": {"name": "Prof. Laila Hernandez", "subject": "CpE 403 - Computer Engineering as a Discipline", "office": "TBA"},
+    "prof ericka vabes ruolda": {"name": "Prof. Ericka Vabes Ruolda", "subject": "ENGG 403 - Computer-Aided Design", "office": "TBA"},
+    "prof ryan banua": {"name": "Prof. Ryan Banua", "subject": "MATH 403 - Engineering Data Analysis", "office": "TBA"}
 }
 
-# ------------------------------
-# FUNCTION — CHECK PROFESSOR QUERY
-# ------------------------------
+# ----------------------------
+# SESSION STATE: chat history, cache, rate-limits
+# ----------------------------
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []  # list of dicts: {"role": "user"/"assistant", "text": "..."}
+if "api_cache" not in st.session_state:
+    # load persistent cache from disk if available
+    cache_file = "chat_cache.json"
+    if os.path.exists(cache_file):
+        try:
+            with open(cache_file, "r", encoding="utf-8") as f:
+                st.session_state.api_cache = json.load(f)
+        except Exception:
+            st.session_state.api_cache = {}
+    else:
+        st.session_state.api_cache = {}
+if "last_request_time" not in st.session_state:
+    st.session_state.last_request_time = 0.0
+
+# ----------------------------
+# HELPERS
+# ----------------------------
 def check_professor_query(user_input):
-    for name, room in professors.items():
-        if name.lower() in user_input.lower():
-            return f"📌 **Faculty Room of Prof. {name}:**\n➡️ {room}"
+    """Return professor info string if user asked about professor (fuzzy contains)."""
+    # exact or fuzzy matching: check if any professor key present in sentence
+    lower = user_input.lower()
+    for key, info in teachers_info.items():
+        if key in lower or info["name"].lower() in lower:
+            return f"👨‍🏫 **{info['name']}**\n**Subject:** {info['subject']}\n**Office:** {info['office']}"
+    # also try fuzzy partial matches using difflib
+    matches = get_close_matches(lower, list(teachers_info.keys()), n=1, cutoff=0.6)
+    if matches:
+        info = teachers_info[matches[0]]
+        return f"👨‍🏫 **{info['name']}**\n**Subject:** {info['subject']}\n**Office:** {info['office']}"
     return None
 
-# ------------------------------
-# FUNCTION — CALL OPENROUTER API
-# ------------------------------
-def ask_openrouter(model, user_prompt):
-    url = "https://openrouter.ai/api/v1/chat/completions"
+def save_cache():
+    try:
+        with open("chat_cache.json", "w", encoding="utf-8") as f:
+            json.dump(st.session_state.api_cache, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+def call_openrouter(user_input):
+    """Call OpenRouter with the hard-coded key and fixed model.
+       Handles rate-limit (simple throttling), errors, and caching."""
+    # check cache first
+    if user_input in st.session_state.api_cache:
+        return st.session_state.api_cache[user_input], "cache"
+
+    # rate-limit: allow one request every 2.5 seconds (adjust as needed)
+    now = time.time()
+    if now - st.session_state.last_request_time < 2.5:
+        return "⚠️ Too many requests locally — please wait a few seconds.", "local-rate"
 
     body = {
-        "model": model,
+        "model": OPENROUTER_MODEL,
         "messages": [
-            {"role": "user", "content": user_prompt}
+            {"role": "system", "content": "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
+            {"role": "user", "content": user_input}
         ]
     }
 
     try:
-        response = requests.post(url, headers=HEADERS, json=body)
-        response.raise_for_status()
-        data = response.json()
-        return data["choices"][0]["message"]["content"]
-
+        resp = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=OPENROUTER_HEADERS, json=body, timeout=30)
+        st.session_state.last_request_time = time.time()
+        resp.raise_for_status()
+        data = resp.json()
+        # defensive access
+        reply = None
+        try:
+            reply = data["choices"][0]["message"]["content"]
+        except Exception:
+            reply = json.dumps(data)
+        # save to cache
+        st.session_state.api_cache[user_input] = reply
+        save_cache()
+        return reply, "api"
     except requests.exceptions.HTTPError as e:
-        return f"⚠️ OpenRouter error: {e}"
-    except Exception:
-        return "⚠️ Something went wrong communicating with OpenRouter."
+        code = None
+        try:
+            code = e.response.status_code
+        except Exception:
+            code = None
+        if code == 401:
+            return "⚠️ OpenRouter unauthorized (401). Check your API key or model access.", "error"
+        if code == 429:
+            return "⚠️ OpenRouter rate limit reached (429). Try again later.", "error"
+        return f"⚠️ OpenRouter HTTP error: {e}", "error"
+    except requests.exceptions.RequestException as e:
+        return f"⚠️ Connection error: {e}", "error"
+    except Exception as e:
+        return f"⚠️ Unexpected error: {e}", "error"
 
-# ------------------------------
-# UI — MODEL SELECTOR
-# ------------------------------
-model_choice = st.selectbox(
-    "Choose OpenRouter model:",
-    [
-        "tngtech/deepseek-r1t2-chimera:free",
-        "qwen/qwen3-coder:free",
-        "meta-llama/llama-3.2-3b-instruct:free",
-        "google/gemini-2.0-flash-exp:free"
-    ]
-)
+# ----------------------------
+# MAIN CHAT UI (single-column)
+# ----------------------------
+st.markdown("### 💬 Chat (KITE-AI)")
+st.markdown("Ask about professors or general CPE topics. Professor info works offline; AI replies require the OpenRouter key.")
 
-# ------------------------------
-# CHAT INPUT
-# ------------------------------
-user_input = st.text_input("💬 Ask something:")
+# chat container
+st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
+# display current session chat history
+for msg in st.session_state.chat_history:
+    role_class = "user-msg" if msg["role"] == "user" else "bot-msg"
+    # escape HTML content but maintain newlines (Streamlit auto-escapes, using markdown with unsafe)
+    st.markdown(f"<div class='chat-box {role_class}'>{msg['text']}</div>", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
-if st.button("Send"):
-    if not user_input:
-        st.warning("Please enter a question.")
-    else:
-        # 1 — Check if it's about a professor
-        prof_answer = check_professor_query(user_input)
+# unique input widget keys to avoid duplicate IDs
+user_text = st.text_input("Type your message here:", key="kite_chat_input")
+col_a, col_b, col_c = st.columns([1,1,6])
+with col_a:
+    send = st.button("Send", key="kite_send_button")
+with col_b:
+    clear = st.button("Clear chat", key="kite_clear_button")
+# small status column for manual actions
+with col_c:
+    st.write("")  # placeholder, keeps layout consistent
+
+# handle clear chat
+if clear:
+    st.session_state.chat_history = []
+    st.experimental_rerun()
+
+# when user sends
+if send and user_text:
+    # append user message
+    st.session_state.chat_history.append({"role": "user", "text": st.markdown(user_text) or user_text})
+    # display immediately (optimistic)
+    st.experimental_rerun()  # rerun to show the user message in container
+
+# The code above does an immediate rerun after appending user message so the UI updates.
+# The following block handles the actual response generation after rerun (when send button no longer fresh)
+# We use a hidden flag in session_state to detect we need to create a reply.
+if "pending_reply" not in st.session_state:
+    st.session_state.pending_reply = None
+
+# If last message is from user and not yet replied to, generate reply
+if st.session_state.chat_history:
+    last = st.session_state.chat_history[-1]
+    if last["role"] == "user" and (st.session_state.pending_reply is None or st.session_state.pending_reply != last["text"]):
+        st.session_state.pending_reply = last["text"]
+        user_query = last["text"]
+
+        # Try professor lookup first
+        prof_answer = check_professor_query(user_query)
         if prof_answer:
-            st.success(prof_answer)
-        else:
-            # 2 — Use OpenRouter AI
-            if not OPENROUTER_API_KEY:
-                st.error("❌ API key missing!")
-            else:
-                st.info("🧠 Asking OpenRouter…")
-                reply = ask_openrouter(model_choice, user_input)
-                st.write("### 🤖 AI Response:")
-                st.write(reply)
+            st.session_state.chat_history.append({"role": "assistant", "text": prof_answer})
+            st.session_state.pending_reply = None
+            st.experimental_rerun()
 
-# ------------------------------
-# UI — MODEL SELECTOR
-# ------------------------------
-model_choice = st.selectbox(
-    "Choose OpenRouter model:",
-    [
-        "tngtech/deepseek-r1t2-chimera:free",
-        "qwen/qwen3-coder:free",
-        "meta-llama/llama-3.2-3b-instruct:free",
-        "google/gemini-2.0-flash-exp:free"
-    ]
-)
+        # Not a professor query: call OpenRouter
+        with st.spinner("🤖 KITE-AI is thinking..."):
+            reply_text, source = call_openrouter(user_query)
 
-# ------------------------------
-# CHAT INPUT
-# ------------------------------
-user_input = st.text_input("💬 Ask something:")
+        # Append reply
+        st.session_state.chat_history.append({"role": "assistant", "text": reply_text})
+        st.session_state.pending_reply = None
+        st.experimental_rerun()
 
-if st.button("Send"):
-    if not user_input:
-        st.warning("Please enter a question.")
-    else:
-        # 1 — Check if it's about a professor
-        prof_answer = check_professor_query(user_input)
-        if prof_answer:
-            st.success(prof_answer)
-        else:
-            # 2 — Use OpenRouter AI
-            if not OPENROUTER_API_KEY:
-                st.error("❌ No API key found in secrets!")
-            else:
-                st.info("🧠 Asking OpenRouter…")
-                reply = ask_openrouter(model_choice, user_input)
-                st.write("### 🤖 AI Response:")
-                st.write(reply)
+# ----------------------------
+# FOOTER: show cache size & controls
+# ----------------------------
+st.markdown("---")
+cache_info_col1, cache_info_col2 = st.columns([4,1])
+with cache_info_col1:
+    cached = len(st.session_state.api_cache)
+    st.markdown(f"**Cache:** {cached} entries (saved to `chat_cache.json`)")
+with cache_info_col2:
+    if st.button("Clear cache", key="kite_clear_cache"):
+        st.session_state.api_cache = {}
+        save_cache()
+        st.success("Cache cleared.")
+
+# helpful debug (small, collapsible)
+with st.expander("Debug (technical)"):
+    st.write("Last request time:", st.session_state.last_request_time)
+    st.write("Cache keys (showing up to 10):", list(st.session_state.api_cache.keys())[:10])
+    st.write("Chat history length:", len(st.session_state.chat_history))
+    st.write("OpenRouter model:", OPENROUTER_MODEL)
 
 
 
@@ -544,6 +670,7 @@ elif menu == "📘 About":
     </ul>
     </div>
     """, unsafe_allow_html=True)
+
 
 
 
