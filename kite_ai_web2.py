@@ -1,48 +1,69 @@
 # kite_ai_web2.py
-# Streamlit Web Version of KITE-AI 2.0 (Integrated for CPE 2nd Year)
+# Streamlit Web Version of KITE-AI (Integrated for CPE 2nd Year)
+# Includes Physics, Circuits, AI Toolkit, Task Manager, and CPE Chatbot
 
 import streamlit as st
 import numpy as np
 import os
 import json
-import requests
 import time
+import requests
 from difflib import get_close_matches
 
-# --- PAGE CONFIG ---
+# --- Page Config ---
 st.set_page_config(page_title="KITE-AI Web 2.0", page_icon="🤖", layout="wide")
 
-# --- GLOBAL THEME ---
+# --- Small Header Icon ---
+icon_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/568672685_718166897320759_4217860298229868715_n.jpg"
+st.markdown(f"""
+    <div style="display: flex; justify-content: center; align-items: center; padding: 5px 0;">
+        <img src="{icon_url}" style="
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255,60,60,0.5);
+            border: 2px solid rgba(255,255,255,0.3);
+        ">
+    </div>
+""", unsafe_allow_html=True)
+
+# --- Global Theme ---
 st.markdown("""
 <style>
-/* --- APP BACKGROUND --- */
-[data-testid="stAppViewContainer"]{
+[data-testid="stAppViewContainer"] {
     background: radial-gradient(circle at top left, #0a0a0f 0%, #101520 60%, #0b0c10 100%);
     color: white !important;
     font-family: 'Segoe UI', sans-serif;
 }
-
-/* --- HEADER --- */
 header[data-testid="stHeader"] {
     background: linear-gradient(90deg, #2b0000, #4a0000, #2b0000);
     color: #FF4C4C !important;
-    box-shadow: 0 0 25px rgba(255,60,60,0.3);
-    border-bottom: 1px solid rgba(255,80,80,0.4);
+    box-shadow: 0 0 25px rgba(255, 60, 60, 0.3);
+    border-bottom: 1px solid rgba(255, 80, 80, 0.4);
 }
-
-/* --- SIDEBAR --- */
-[data-testid="stSidebar"]{
-    background: rgba(30,0,0,0.85);
+[data-testid="stSidebar"] {
+    background: rgba(30, 0, 0, 0.8);
     backdrop-filter: blur(15px);
-    border-right: 1px solid rgba(255,50,50,0.3);
+    border-right: 1px solid rgba(255, 50, 50, 0.2);
 }
-[data-testid="stSidebar"] *{
-    color: #FFD6D6 !important;
+[data-testid="stSidebar"] * { color: #FFD6D6 !important; }
+h1,h2,h3,h4 { color: #FF4C4C !important; text-shadow: 0 0 25px rgba(255,60,60,0.5); }
+button[kind="primary"] {
+    background: linear-gradient(135deg, #B00000, #FF0000);
+    color: white !important;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 0 15px rgba(255,60,60,0.3);
+    transition: all 0.2s ease-in-out;
 }
-
-/* --- SIDEBAR TITLE --- */
-[data-testid="stSidebarNav"]::before{
-    content:"🔥 KITE-AI SYSTEM";
+button[kind="primary"]:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(255,80,80,0.6);
+}
+button { background-color: rgba(40, 0, 0, 0.8) !important; color: #FF4C4C !important; border: 1px solid rgba(255, 50, 50, 0.4); border-radius: 10px; transition: 0.3s; }
+button:hover { background-color: rgba(70,0,0,0.9) !important; box-shadow: 0 0 20px rgba(255,60,60,0.4); }
+[data-testid="stSidebarNav"]::before {
+    content: "🔥 KITE-AI SYSTEM";
     margin-left: 15px;
     margin-top: 10px;
     font-size: 20px;
@@ -50,52 +71,11 @@ header[data-testid="stHeader"] {
     color: #FF4C4C;
     text-shadow: 0 0 25px rgba(255,80,80,0.6);
 }
-
-/* --- BUTTONS --- */
-button[kind="primary"]{
-    background: linear-gradient(135deg, #B00000, #FF0000);
-    color:white !important;
-    border-radius: 12px;
-    border:none;
-    box-shadow: 0 0 15px rgba(255,60,60,0.3);
-    transition: 0.2s;
-}
-button[kind="primary"]:hover{
-    transform: scale(1.05);
-    box-shadow: 0 0 25px rgba(255,80,80,0.6);
-}
-button{
-    background-color: rgba(40,0,0,0.8) !important;
-    color:#FF4C4C !important;
-    border: 1px solid rgba(255,50,50,0.4);
-    border-radius:10px;
-    transition:0.3s;
-}
-button:hover{
-    background-color: rgba(70,0,0,0.9) !important;
-    box-shadow:0 0 20px rgba(255,60,60,0.4);
-}
-
-/* --- HEADINGS --- */
-h1,h2,h3,h4{
-    color:#FF4C4C !important;
-    text-shadow:0 0 25px rgba(255,60,60,0.5);
-}
-
-/* --- FOOTER HIDDEN --- */
-footer{visibility:hidden;}
+footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# --- HEADER ICON ---
-icon_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/568672685_718166897320759_4217860298229868715_n.jpg"
-st.markdown(f"""
-<div style="display:flex; justify-content:center; align-items:center; padding:5px 0;">
-<img src="{icon_url}" style="width:70px;height:70px;border-radius:50%;box-shadow:0 0 15px rgba(255,60,60,0.5);border:2px solid rgba(255,255,255,0.3);">
-</div>
-""", unsafe_allow_html=True)
-
-# --- SIDEBAR MENU ---
+# --- Sidebar Navigation ---
 menu = st.sidebar.radio("Navigation", [
     "🏠 Home", "🗂️ Task Manager", "⚙️ Physics Calculator",
     "📏 Unit Converter", "🔌 Electrical Assistant",
@@ -105,41 +85,56 @@ menu = st.sidebar.radio("Navigation", [
 # ================= HOME =================
 if menu == "🏠 Home":
     bg_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/BSU.jpg"
+
     st.markdown(f"""
     <style>
     .hero {{
         position: relative;
-        background-image: url('{bg_url}');
+        background-image: url("{bg_url}");
         background-size: cover;
         background-position: center;
         height: 550px;
-        border-radius:15px;
-        text-align:center;
-        color:white;
-        display:flex;
-        flex-direction:column;
-        justify-content:center;
-        box-shadow:0 0 30px rgba(255,60,60,0.4);
+        border-radius: 15px;
+        text-align: center;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: 0 0 30px rgba(255,60,60,0.4);
     }}
     .overlay {{
-        position:absolute;
-        top:0; left:0;
-        width:100%; height:100%;
-        background:rgba(0,0,0,0.5);
-        border-radius:15px;
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        border-radius: 15px;
     }}
-    .hero-content {{
-        position:relative; z-index:1; padding:20px;
+    .hero-content {{ position: relative; z-index: 1; padding: 20px; }}
+    .hero h1 {{ font-size: 55px; font-weight: 800; color: #FF4C4C; text-shadow: 0 0 25px rgba(255,60,60,0.7); }}
+    .hero h3 {{
+        font-size: 22px;
+        background: rgba(255,0,0,0.6);
+        display: inline-block;
+        padding: 10px 25px;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 0 20px rgba(255,60,60,0.4);
     }}
-    .hero h1{{font-size:55px; font-weight:800; color:#FF4C4C; text-shadow:0 0 25px rgba(255,60,60,0.7);}}
-    .hero h3{{font-size:22px; background:rgba(255,0,0,0.6); display:inline-block; padding:10px 25px; border-radius:10px; color:white; font-weight:600; box-shadow:0 0 20px rgba(255,60,60,0.4);}}
-    .vision {{margin-top:60px; padding:30px; background:rgba(40,0,0,0.6); border-radius:15px; box-shadow:0 0 25px rgba(255,60,60,0.3); text-align:center;}}
-    .vision h2 {{color:#FF4C4C; text-shadow:0 0 20px rgba(255,60,60,0.5); font-size:34px; margin-bottom:15px;}}
-    .vision p {{color:#FFEAEA; font-size:18px; line-height:1.6; max-width:850px; margin:0 auto;}}
+    .vision {{
+        margin-top: 60px;
+        padding: 30px;
+        background: rgba(40, 0, 0, 0.6);
+        border-radius: 15px;
+        box-shadow: 0 0 25px rgba(255,60,60,0.3);
+        text-align: center;
+    }}
+    .vision h2 {{ color: #FF4C4C; text-shadow: 0 0 20px rgba(255,60,60,0.5); font-size: 34px; margin-bottom: 15px; }}
+    .vision p {{ color: #FFEAEA; font-size: 18px; line-height: 1.6; margin: 0 auto; max-width: 850px; }}
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("""
+    st.markdown(f"""
     <div class="hero">
         <div class="overlay"></div>
         <div class="hero-content">
@@ -147,16 +142,13 @@ if menu == "🏠 Home":
             <h3>Empowering Computer Engineering Students with Essential Tools</h3>
         </div>
     </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
     <div class="vision">
         <h2>Our VISION</h2>
         <p>
-        At <strong>COMKITE</strong>, we are dedicated to revolutionizing the learning experience 
-        for Computer Engineering students. Our goal is to provide a comprehensive suite of 
-        computational tools and resources to enhance their academic journey and prepare them 
-        for real-world challenges.
+        At <strong>COMKITE</strong>, we aim to revolutionize the learning experience
+        for Computer Engineering students. Our goal is to provide a comprehensive suite
+        of computational tools and resources to enhance their academic journey and prepare
+        them for real-world challenges.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -167,114 +159,178 @@ elif menu == "🗂️ Task Manager":
     task_file = "tasks.txt"
 
     def load_tasks():
-        return open(task_file).read().splitlines() if os.path.exists(task_file) else []
+        if os.path.exists(task_file):
+            with open(task_file, "r") as f:
+                return [line.strip() for line in f.readlines()]
+        return []
 
     def save_tasks(tasks):
-        with open(task_file,"w") as f:
-            f.writelines([t+"\n" for t in tasks])
+        with open(task_file, "w") as f:
+            for t in tasks: f.write(t + "\n")
 
     tasks = load_tasks()
     new_task = st.text_input("Add new task:")
     if st.button("Add Task"):
-        if new_task: tasks.append(new_task); save_tasks(tasks); st.success(f"Task added: {new_task}")
-        else: st.warning("Enter a task first!")
+        if new_task:
+            tasks.append(new_task)
+            save_tasks(tasks)
+            st.success(f"Task added: {new_task}")
+        else:
+            st.warning("Enter a task first!")
 
     if tasks:
         st.subheader("Your Tasks:")
-        for i,t in enumerate(tasks):
-            col1,col2 = st.columns([5,1])
+        for i, t in enumerate(tasks):
+            col1, col2 = st.columns([5,1])
             with col1: st.write(f"{i+1}. {t}")
             with col2:
                 if st.button("❌", key=f"del_{i}"):
-                    tasks.pop(i); save_tasks(tasks); st.experimental_rerun()
-    else: st.info("No tasks added yet.")
+                    tasks.pop(i)
+                    save_tasks(tasks)
+                    st.experimental_rerun()
+    else:
+        st.info("No tasks added yet.")
 
 # ================= PHYSICS CALCULATOR =================
 elif menu == "⚙️ Physics Calculator":
     st.header("⚙️ Physics Calculator")
-    formula = st.selectbox("Choose a formula:", ["Force", "Work", "Power","Kinetic Energy","Potential Energy"])
-    if formula=="Force": m=st.number_input("Mass (kg)"); a=st.number_input("Accel (m/s²)")
-    if formula=="Work": F=st.number_input("Force (N)"); d=st.number_input("Distance (m)")
-    if formula=="Power": W=st.number_input("Work (J)"); t=st.number_input("Time (s)")
-    if formula=="Kinetic Energy": m2=st.number_input("Mass (kg)"); v=st.number_input("Velocity (m/s)")
-    if formula=="Potential Energy": m3=st.number_input("Mass (kg)"); g=st.number_input("Gravity",9.81); h=st.number_input("Height (m)")
-
-    if st.button("Compute"):
-        if formula=="Force": st.success(f"Force = {m*a:.2f} N")
-        if formula=="Work": st.success(f"Work = {F*d:.2f} J")
-        if formula=="Power": st.success(f"Power = {W/t:.2f} W" if t!=0 else "Time cannot be zero")
-        if formula=="Kinetic Energy": st.success(f"KE = {0.5*m2*v**2:.2f} J")
-        if formula=="Potential Energy": st.success(f"PE = {m3*g*h:.2f} J")
+    options = st.selectbox("Choose a formula:", [
+        "Force (F = m * a)",
+        "Work (W = F * d)",
+        "Power (P = W / t)",
+        "Kinetic Energy (KE = 0.5 * m * v²)",
+        "Potential Energy (PE = m * g * h)"
+    ])
+    if options == "Force (F = m * a)":
+        m = st.number_input("Mass (kg)", 0.0)
+        a = st.number_input("Acceleration (m/s²)", 0.0)
+        if st.button("Compute Force"): st.success(f"Force = {m*a:.2f} N")
+    elif options == "Work (W = F * d)":
+        F = st.number_input("Force (N)", 0.0)
+        d = st.number_input("Distance (m)", 0.0)
+        if st.button("Compute Work"): st.success(f"Work = {F*d:.2f} J")
+    elif options == "Power (P = W / t)":
+        W = st.number_input("Work (J)", 0.0)
+        t = st.number_input("Time (s)", 0.0)
+        if st.button("Compute Power"):
+            if t != 0: st.success(f"Power = {W/t:.2f} W")
+            else: st.error("Time cannot be zero.")
+    elif options == "Kinetic Energy (KE = 0.5 * m * v²)":
+        m = st.number_input("Mass (kg)", 0.0)
+        v = st.number_input("Velocity (m/s)", 0.0)
+        if st.button("Compute KE"): st.success(f"Kinetic Energy = {0.5*m*v**2:.2f} J")
+    elif options == "Potential Energy (PE = m * g * h)":
+        m = st.number_input("Mass (kg)", 0.0)
+        g = st.number_input("Gravity (m/s²)", 9.81)
+        h = st.number_input("Height (m)", 0.0)
+        if st.button("Compute PE"): st.success(f"Potential Energy = {m*g*h:.2f} J")
 
 # ================= UNIT CONVERTER =================
 elif menu == "📏 Unit Converter":
     st.header("📏 Unit Converter")
-    conv_type = st.selectbox("Conversion Type:", ["Length (m↔ft)","Mass (kg↔lb)","Temp (°C↔°F)","Speed (km/h↔mph)"])
-    if conv_type=="Length (m↔ft)":
-        m=st.number_input("Meters"); st.write(f"{m} m = {m*3.28084:.2f} ft")
-    if conv_type=="Mass (kg↔lb)":
-        kg=st.number_input("Kilograms"); st.write(f"{kg} kg = {kg*2.20462:.2f} lb")
-    if conv_type=="Temp (°C↔°F)":
-        c=st.number_input("°C"); st.write(f"{c}°C = {c*9/5+32:.2f}°F")
-    if conv_type=="Speed (km/h↔mph)":
-        kmh=st.number_input("Speed km/h"); st.write(f"{kmh} km/h = {kmh*0.621371:.2f} mph")
+    conv_type = st.selectbox("Select Conversion Type:", ["Length (m ↔ ft)","Mass (kg ↔ lb)","Temperature (°C ↔ °F)","Speed (km/h ↔ mph)"])
+    if conv_type == "Length (m ↔ ft)":
+        m = st.number_input("Meters", 0.0)
+        st.write(f"{m} m = {m*3.28084:.2f} ft")
+    elif conv_type == "Mass (kg ↔ lb)":
+        kg = st.number_input("Kilograms", 0.0)
+        st.write(f"{kg} kg = {kg*2.20462:.2f} lb")
+    elif conv_type == "Temperature (°C ↔ °F)":
+        c = st.number_input("Temperature (°C)", 0.0)
+        st.write(f"{c}°C = {(c*9/5)+32:.2f}°F")
+    elif conv_type == "Speed (km/h ↔ mph)":
+        kmh = st.number_input("Speed (km/h)", 0.0)
+        st.write(f"{kmh} km/h = {kmh*0.621371:.2f} mph")
 
 # ================= ELECTRICAL ASSISTANT =================
 elif menu == "🔌 Electrical Assistant":
     st.header("🔌 Electrical Assistant")
-    option=st.selectbox("Select:",["Ohm's Law","Power","Series Res","Parallel Res"])
-    if option=="Ohm's Law": I=st.number_input("Current (A)"); R=st.number_input("Resistance (Ω)"); st.write(f"Voltage = {I*R:.2f} V")
-    if option=="Power": V=st.number_input("Voltage (V)"); I=st.number_input("Current (A)"); st.write(f"Power = {V*I:.2f} W")
-    if option=="Series Res": r=st.text_input("Resistances (comma)"); 
-        if r: st.write(f"Total = {sum([float(x) for x in r.split(',')]):.2f} Ω")
-    if option=="Parallel Res": r=st.text_input("Resistances (comma)")
-        if r: vals=[float(x) for x in r.split(',')]; total=1/sum(1/v for v in vals); st.write(f"Total = {total:.2f} Ω")
+    option = st.selectbox("Select Calculation:", ["Ohm's Law", "Power", "Series Resistance", "Parallel Resistance"])
+    
+    if option == "Ohm's Law":
+        I = st.number_input("Current (A)", 0.0)
+        R = st.number_input("Resistance (Ω)", 0.0)
+        st.write(f"Voltage = {I*R:.2f} V")
+    elif option == "Power":
+        V = st.number_input("Voltage (V)", 0.0)
+        I = st.number_input("Current (A)", 0.0)
+        st.write(f"Power = {V*I:.2f} W")
+    elif option == "Series Resistance":
+        resistors = st.text_input("Enter resistances (comma-separated):")
+        if resistors:
+            try:
+                values = [float(r.strip()) for r in resistors.split(",")]
+                st.success(f"Total Resistance = {sum(values):.2f} Ω")
+            except:
+                st.error("Invalid input.")
+    elif option == "Parallel Resistance":
+        resistors = st.text_input("Enter resistances (comma-separated):")
+        if resistors:
+            try:
+                values = [float(r.strip()) for r in resistors.split(",")]
+                total = 1 / sum(1/r for r in values if r != 0)
+                st.success(f"Total Resistance = {total:.2f} Ω")
+            except:
+                st.error("Invalid input.")
 
 # ================= CPE CHATBOT =================
-elif menu=="💬 CPE Chatbot":
-    st.header("💬 CPE Chatbot")
-    st.markdown("Ask about your 2nd Year professors or topics!")
+elif menu == "💬 CPE Chatbot":
+    st.header("💬 CPE Student ChatBot")
+    st.markdown("Ask me anything about Computer Engineering 2nd Year!")
 
-    # --- TEACHER DATABASE ---
-    teachers_info={
-        "prof jennifer l. marasigan":{"name":"Prof. Jennifer L. Marasigan","subject":"CpE 403","office":"CICS 2nd Flr"},
-        "prof christia a. manalo":{"name":"Prof. Christia A. Manalo","subject":"ENGG 403","office":"AEB 4th Flr"},
-        "prof maria carmela m. carandang":{"name":"Prof. Maria Carmela M. Carandang","subject":"PATHFit 3","office":"FDC 103"},
-        "prof giovanni c. sarcilla":{"name":"Prof. Giovanni C. Sarcilla","subject":"ENGG 404","office":"AEB 2nd Flr"},
+    # --- Styling ---
+    st.markdown("""
+    <style>
+    .chat-message { border-radius: 12px; padding: 12px 18px; margin: 8px 0; max-width: 85%; font-size: 16px; }
+    .chat-message.user { background-color: #FF4C4C; color: white; margin-left: auto; text-align: right; box-shadow: 0 0 15px rgba(255,60,60,0.5); }
+    .chat-message.assistant { background-color: #f5f5f5; color: #222; margin-right: auto; text-align: left; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # --- Teacher Database ---
+    teachers_info = {
+        "prof jennifer l. marasigan": {"name":"Prof. Jennifer L. Marasigan","subject":"CpE 403 - Computer Engineering as a Discipline","office":"CICS 2nd Flr"},
+        "prof christia a. manalo": {"name":"Prof. Christia A. Manalo","subject":"ENGG 403 - Computer-Aided Design","office":"AEB 4th Flr"},
+        # add other professors...
     }
 
-    if "chat_history" not in st.session_state: st.session_state.chat_history=[]
-    if "api_cache" not in st.session_state: st.session_state.api_cache={}
+    # --- Persistent cache ---
+    cache_file = "chat_cache.json"
+    if "chat_history" not in st.session_state: st.session_state.chat_history = []
+    if "api_cache" not in st.session_state:
+        if os.path.exists(cache_file):
+            with open(cache_file,"r") as f: st.session_state.api_cache = json.load(f)
+        else: st.session_state.api_cache = {}
 
-    user_input = st.text_input("You:")
-
+    # --- User input ---
+    user_input = st.text_input("You:", placeholder="Ask something...")
     if user_input:
-        response_text="🤔 Not sure. Ask class rep."
-        closest=get_close_matches(user_input.lower(), teachers_info.keys(),n=1,cutoff=0.6)
-        if closest: info=teachers_info[closest[0]]; response_text=f"**{info['name']}**\nSubject: {info['subject']}\nOffice: {info['office']}"
+        response_text = "🤔 I'm not sure yet. Ask your class representative."
+        closest = get_close_matches(user_input.lower(), teachers_info.keys(), n=1, cutoff=0.6)
+        if closest:
+            info = teachers_info[closest[0]]
+            response_text = f"**{info['name']}**\nSubject: {info['subject']}\nOffice: {info['office']}"
+        else:
+            if user_input in st.session_state.api_cache:
+                response_text = st.session_state.api_cache[user_input]
+            else:
+                OPENROUTER_API_KEY = "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"
+                headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
+                payload = {"model":"qwen/qwen3-coder:free","messages":[{"role":"system","content":"You are KITE-AI, a friendly AI assistant for Computer Engineering students."},{"role":"user","content":user_input}]}
+                try:
+                    with st.spinner("KITE-AI is thinking..."):
+                        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=30)
+                        response.raise_for_status()
+                        data = response.json()
+                        response_text = data["choices"][0]["message"]["content"]
+                        st.session_state.api_cache[user_input] = response_text
+                        with open(cache_file,"w") as f: json.dump(st.session_state.api_cache,f,indent=2)
+                except Exception as e:
+                    response_text = f"⚠️ Error: {e}"
+
         st.session_state.chat_history.append({"role":"user","content":user_input})
         st.session_state.chat_history.append({"role":"assistant","content":response_text})
 
     for msg in st.session_state.chat_history:
-        role="user" if msg["role"]=="user" else "assistant"
-        color="#FF4C4C" if role=="user" else "#f5f5f5"
-        text_color="white" if role=="user" else "#222"
-        st.markdown(f'<div style="background:{color}; color:{text_color}; border-radius:12px; padding:12px; margin:5px; max-width:85%; text-align:{"right" if role=="user" else "left"};">{msg["content"]}</div>',unsafe_allow_html=True)
-
-# ================= ABOUT =================
-elif menu=="📘 About":
-    st.header("📘 About KITE-AI Web 2.0")
-    st.markdown("""
-    <div style="background: rgba(40,0,0,0.6); padding:20px; border-radius:15px; box-shadow:0 0 25px rgba(255,60,60,0.3); color:#FFEAEA; font-size:16px; line-height:1.6;">
-    <strong>Developed for:</strong> Computer Engineering 2nd Year<br>
-    <strong>Purpose:</strong> Integration of Engineering calculators and AI Chatbot<br>
-    <strong>Modules:</strong>
-    <ul>
-        <li>Task Manager</li>
-        <li>Physics & Electrical Calculators</li>
-        <li>Unit Converters</li>
-        <li>AI Demos</li>
-        <li>Student Chatbot</li>
-    </ul>
-    </div>
-    """, unsafe_allow_html=True)
+        role_class = "user" if msg["role"]=="user" else "assistant"
+        st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html
