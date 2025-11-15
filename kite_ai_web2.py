@@ -443,7 +443,7 @@ elif menu == "💬 CPE Chatbot":
                 OPENROUTER_API_KEY = "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"
                 headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
                 payload = {
-                    "model": "meta-llama/llama-2-7b-chat:free",
+                    "model": "google/gemini-2.0-flash-exp:free",
                     "messages": [
                         {"role": "system", "content":
                          "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
@@ -487,6 +487,7 @@ elif menu == "💬 CPE Chatbot":
         st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html=True)
 
 
+
 # -------------------- ABOUT --------------------
 elif menu == "📘 About":
     st.header("📘 About KITE-AI Web 2.0")
@@ -512,6 +513,7 @@ elif menu == "📘 About":
     </ul>
     </div>
     """, unsafe_allow_html=True)
+
 
 
 
