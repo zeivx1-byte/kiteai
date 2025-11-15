@@ -515,7 +515,7 @@ elif menu == "💬 CPE Chatbot":
                 OPENROUTER_API_KEY = "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"
                 headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
                 payload = {
-                    "model": "google/gemini-2.0-flash-exp:free",
+                    "model": "meta-llama/llama-2-7b-chat:free",
                     "messages": [
                         {"role": "system", "content":
                          "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
@@ -523,31 +523,32 @@ elif menu == "💬 CPE Chatbot":
                     ]
                 }
 
-                for attempt in range(2):  # retry once
-                    try:
-                        with st.spinner("KITE-AI is thinking..."):
-                            response = requests.post(
-                                "https://openrouter.ai/api/v1/chat/completions",
-                                headers=headers,
-                                json=payload,
-                                timeout=30
-                            )
-                            response.raise_for_status()
-                            data = response.json()
-                            response_text = data["choices"][0]["message"]["content"]
+                try:
+                    with st.spinner("KITE-AI is thinking..."):
+                        response = requests.post(
+                            "https://openrouter.ai/api/v1/chat/completions",
+                            headers=headers,
+                            json=payload,
+                            timeout=30
+                        )
+                        response.raise_for_status()
+                        data = response.json()
+                        response_text = data["choices"][0]["message"]["content"]
 
-                            # Save session & persistent cache
-                            st.session_state.api_cache[user_input] = response_text
-                            with open(cache_file, "w") as f:
-                                json.dump(st.session_state.api_cache, f, indent=2)
-                            break
-                    except requests.exceptions.RequestException as e:
-                        if attempt == 0:
-                            time.sleep(2)
-                        else:
-                            response_text = f"⚠️ OpenRouter request failed: {e}\nYou can still ask about professors."
-                    except Exception as e:
-                        response_text = f"⚠️ Unexpected error: {e}"
+                        # Save session & persistent cache
+                        st.session_state.api_cache[user_input] = response_text
+                        with open(cache_file, "w") as f:
+                            json.dump(st.session_state.api_cache, f, indent=2)
+
+                except requests.exceptions.HTTPError as e:
+                    if e.response.status_code == 429:
+                        response_text = "⚠️ OpenRouter rate limit reached. Only professor info is available right now."
+                    elif e.response.status_code == 401:
+                        response_text = "⚠️ OpenRouter unauthorized. Only professor info is available."
+                    else:
+                        response_text = f"⚠️ OpenRouter request failed: {e}\nYou can still ask about professors."
+                except Exception as e:
+                    response_text = f"⚠️ Unexpected error: {e}\nYou can still ask about professors."
 
         # --- Save chat history ---
         st.session_state.chat_history.append({"role": "user", "content": user_input})
@@ -557,7 +558,6 @@ elif menu == "💬 CPE Chatbot":
     for msg in st.session_state.chat_history:
         role_class = "user" if msg["role"] == "user" else "assistant"
         st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html=True)
-
 
 
 
@@ -586,6 +586,7 @@ elif menu == "📘 About":
     </ul>
     </div>
     """, unsafe_allow_html=True)
+
 
 
 
