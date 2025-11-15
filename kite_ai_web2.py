@@ -362,108 +362,97 @@ elif menu == "🔌 Electrical Assistant":
             except:
                 st.error("Invalid input.")
 
-# -------------------- STUDENT CHATBOT --------------------
 elif menu == "🤖 Student Chatbot":
-    st.header("🤖 KITE-AI Student Chatbot")
+    st.title("🤖 KITE-AI Student Chatbot")
+    st.markdown("Chat with your AI assistant about professors, engineering topics, and more.")
 
-    st.markdown("Ask anything about professors, schedules, engineering topics, or general questions.")
+    # -------------------- Chat History --------------------
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []  # list of {"role": "user"/"assistant", "text": ...}
 
-    # --- Teacher Database ---
+    # -------------------- Chat Display Styling --------------------
+    chat_style = """
+        <style>
+            .chat-box {
+                padding: 12px 18px;
+                margin: 8px 0;
+                border-radius: 14px;
+                max-width: 85%;
+                font-size: 16px;
+                line-height: 1.4;
+                white-space: pre-wrap;
+            }
+            .user-msg {
+                background-color: #0066cc;
+                color: white;
+                margin-left: auto;
+            }
+            .bot-msg {
+                background-color: #f1f1f1;
+                color: black;
+                margin-right: auto;
+            }
+            .chat-container {
+                max-height: 450px;
+                overflow-y: auto;
+                padding-right: 10px;
+                border: 1px solid #ccc;
+                border-radius: 12px;
+                padding: 14px;
+                background: white;
+            }
+        </style>
+    """
+    st.markdown(chat_style, unsafe_allow_html=True)
+
+    # -------------------- Teacher Database --------------------
     teachers_info = {
-        "prof jennifer l. marasigan": {
-            "name": "Prof. Jennifer L. Marasigan",
-            "subject": "CpE 403 - Computer Engineering as a Discipline",
-            "office": "CICS 2nd Flr"
-        },
-        "prof christia a. manalo": {
-            "name": "Prof. Christia A. Manalo",
-            "subject": "ENGG 403 - Computer-Aided Design",
-            "office": "AEB 4th Flr"
-        },
-        "prof maria carmela m. carandang": {
-            "name": "Prof. Maria Carmela M. Carandang",
-            "subject": "PATHFit 3 - Traditional and Recreational Games",
-            "office": "FDC 103"
-        },
-        "prof giovanni c. sarcilla": {
-            "name": "Prof. Giovanni C. Sarcilla",
-            "subject": "ENGG 404 - Engineering Economics",
-            "office": "AEB 2nd Flr"
-        },
-        "prof monique a. coliat": {
-            "name": "Prof. Monique A. Coliat",
-            "subject": "EE 423 - Fundamentals of Electrical Engineering",
-            "office": "AEB 4th Flr"
-        },
-        "prof joyce ann g. acob": {
-            "name": "Prof. Joyce Ann G. Acob",
-            "subject": "CpE 404 - Programming Logic and Design",
-            "office": "CICS 2nd Flr"
-        },
-        "prof mercedita d. ocampo": {
-            "name": "Prof. Mercedita D. Ocampo",
-            "subject": "CpE 405 - Discrete Mathematics",
-            "office": "CICS 2nd Flr"
-        },
-        "prof jhon kenneth a. de los reyes": {
-            "name": "Prof. Jhon Kenneth A. De Los Reyes",
-            "subject": "MATH 403 - Engineering Data Analysis",
-            "office": "AEB 4th Flr"
-        },
-        "prof charley b. leuterio": {
-            "name": "Prof. Charley B. Leuterio",
-            "subject": "MATH 404 - Differential Equations",
-            "office": "AEB 4th Flr"
-        },
-        # 2105
-        "prof malvin roix orense": {
-            "name": "Prof. Malvin Roix Orense",
-            "subject": "ENGG 404 - Engineering Economics",
-            "office": "TBA"
-        },
-        "prof anthony hernandez": {
-            "name": "Prof. Anthony Hernandez",
-            "subject": "CpE 404 - Programming Logic and Design",
-            "office": "TBA"
-        },
-        "prof kristine bejasa": {
-            "name": "Prof. Kristine Bejasa",
-            "subject": "EE 423 - Fundamentals of Electrical Engineering",
-            "office": "TBA"
-        },
-        "prof laila hernandez": {
-            "name": "Prof. Laila Hernandez",
-            "subject": "CpE 403 - Computer Engineering as a Discipline",
-            "office": "TBA"
-        },
-        "prof ericka vabes ruolda": {
-            "name": "Prof. Ericka Vabes Ruolda",
-            "subject": "ENGG 403 - Computer-Aided Design",
-            "office": "TBA"
-        },
-        "prof ryan banua": {
-            "name": "Prof. Ryan Banua",
-            "subject": "MATH 403 - Engineering Data Analysis",
-            "office": "TBA"
-        }
+        "prof jennifer l. marasigan": {"name": "Prof. Jennifer L. Marasigan","subject": "CpE 403 - Computer Engineering as a Discipline","office": "CICS 2nd Flr"},
+        "prof christia a. manalo": {"name": "Prof. Christia A. Manalo","subject": "ENGG 403 - Computer-Aided Design","office": "AEB 4th Flr"},
+        "prof maria carmela m. carandang": {"name": "Prof. Maria Carmela M. Carandang","subject": "PATHFit 3","office": "FDC 103"},
+        "prof giovanni c. sarcilla": {"name": "Prof. Giovanni C. Sarcilla","subject": "ENGG 404 - Engineering Economics","office": "AEB 2nd Flr"},
+        "prof monique a. coliat": {"name": "Prof. Monique A. Coliat","subject": "EE 423","office": "AEB 4th Flr"},
+        "prof joyce ann g. acob": {"name": "Prof. Joyce Ann G. Acob","subject": "CpE 404","office": "CICS 2nd Flr"},
+        "prof mercedita d. ocampo": {"name": "Prof. Mercedita D. Ocampo","subject": "CpE 405","office": "CICS 2nd Flr"},
+        "prof jhon kenneth a. de los reyes": {"name": "Prof. Jhon Kenneth A. De Los Reyes","subject": "MATH 403","office": "AEB 4th Flr"},
+        "prof charley b. leuterio": {"name": "Prof. Charley B. Leuterio","subject": "MATH 404","office": "AEB 4th Flr"},
+        "prof malvin roix orense": {"name": "Prof. Malvin Roix Orense","subject": "ENGG 404","office": "TBA"},
+        "prof anthony hernandez": {"name": "Prof. Anthony Hernandez","subject": "CpE 404","office": "TBA"},
+        "prof kristine bejasa": {"name": "Prof. Kristine Bejasa","subject": "EE 423","office": "TBA"},
+        "prof laila hernandez": {"name": "Prof. Laila Hernandez","subject": "CpE 403","office": "TBA"},
+        "prof ericka vabes ruolda": {"name": "Prof. Ericka Vabes Ruolda","subject": "ENGG 403","office": "TBA"},
+        "prof ryan banua": {"name": "Prof. Ryan Banua","subject": "MATH 403","office": "TBA"}
     }
 
-    # --- User Input ---
-    user_input = st.text_input("Ask something:")
+    # -------------------- Chat Container --------------------
+    st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
+    for msg in st.session_state.chat_history:
+        role_class = "user-msg" if msg["role"] == "user" else "bot-msg"
+        st.markdown(
+            f"<div class='chat-box {role_class}'>{msg['text']}</div>",
+            unsafe_allow_html=True
+        )
+    st.markdown("</div>", unsafe_allow_html=True)
 
+    # -------------------- Input Field --------------------
+    user_input = st.text_input("Type your message:", placeholder="Ask me anything...")
+
+    # -------------------- When User Sends Message --------------------
     if user_input:
+        st.session_state.chat_history.append({"role": "user", "text": user_input})
 
-        # Check if asking about teacher
         key = user_input.lower().strip()
-        if key in teachers_info:
-            info = teachers_info[key]
-            st.success(f"**{info['name']}**\n\n**Subject:** {info['subject']}\n**Office:** {info['office']}")
-        else:
-            try:
-                import requests
-                import streamlit as st
-                import os
 
+        # ----------- Teacher Info Auto Reply -----------
+        if key in teachers_info:
+            t = teachers_info[key]
+            reply = f"👨‍🏫 **{t['name']}**\n\n**Subject:** {t['subject']}\n**Office:** {t['office']}"
+            st.session_state.chat_history.append({"role": "assistant", "text": reply})
+            st.rerun()
+
+        # ----------- OpenRouter AI Response -----------
+        with st.spinner("🤖 KITE-AI is thinking..."):
+            try:
                 api_key = st.secrets["OPENROUTER_API_KEY"]
 
                 headers = {
@@ -474,24 +463,21 @@ elif menu == "🤖 Student Chatbot":
                 payload = {
                     "model": "tngtech/deepseek-r1t2-chimera:free",
                     "messages": [
-                        {"role": "system", "content": "You are KITE-AI, a helpful engineering student assistant."},
+                        {"role": "system", "content": "You are KITE-AI, a helpful assistant for CPE students."},
                         {"role": "user", "content": user_input}
                     ]
                 }
 
                 url = "https://openrouter.ai/api/v1/chat/completions"
                 response = requests.post(url, headers=headers, json=payload)
+                bot_reply = response.json()["choices"][0]["message"]["content"]
 
-                if response.status_code == 200:
-                    bot_reply = response.json()["choices"][0]["message"]["content"]
-                    st.info(bot_reply)
-                else:
-                    st.error(f"⚠️ OpenRouter error: {response.status_code} - {response.text}")
+                st.session_state.chat_history.append({"role": "assistant", "text": bot_reply})
 
             except Exception as e:
-                st.error(f"⚠️ Error: {e}")
+                st.session_state.chat_history.append({"role": "assistant", "text": f"⚠️ Error: {e}"})
 
-
+        st.rerun()
 
 
 
@@ -520,6 +506,7 @@ elif menu == "📘 About":
     </ul>
     </div>
     """, unsafe_allow_html=True)
+
 
 
 
