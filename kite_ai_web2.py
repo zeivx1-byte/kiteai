@@ -371,7 +371,6 @@ elif menu == "💬 CPE Chatbot":
     # --- Chatbot Styling ---
     st.markdown("""
     <style>
-    /* Chat container */
     .chat-message {
         border-radius: 12px;
         padding: 12px 18px;
@@ -380,8 +379,6 @@ elif menu == "💬 CPE Chatbot":
         line-height: 1.5;
         font-size: 16px;
     }
-
-    /* User message bubble */
     .chat-message.user {
         background-color: #FF4C4C;
         color: white;
@@ -389,8 +386,6 @@ elif menu == "💬 CPE Chatbot":
         text-align: right;
         box-shadow: 0 0 15px rgba(255,60,60,0.5);
     }
-
-    /* Assistant message bubble */
     .chat-message.assistant {
         background-color: #f5f5f5;
         color: #222;
@@ -401,34 +396,111 @@ elif menu == "💬 CPE Chatbot":
     </style>
     """, unsafe_allow_html=True)
 
-    # --- Chatbot Logic ---
-    user_input = st.text_input("You:", placeholder="e.g., Where is Prof Acob office?")
-
-    responses = {
-        "teacher": "Most CPE professors can be found in the CICS, CPE Faculty 2nd floor.",
-        "prof acob": "Professor Acob usually handles computer-related courses and can be found in CICS or in the CPE Lab.",
-        "engr de los reyes": "Engr. De los Reyes often teaches on the 4th floor CEAF Building — check the Circuit Lab.",
-        "class schedule": "CPE 2nd year usually has major subjects from 8:00 AM to 5:00 PM.",
-        "project": "Major projects are often submitted through Google Classroom or the department office.",
-        "subject": "CPE 2nd year subjects include Logic Circuits, Data Structures, Computer Organization, and AI Fundamentals.",
-        "adviser": "Your class adviser can be contacted through the CPE Faculty Messenger Group or during office hours.",
-        "office": "The CPE  Office is located in 2nd floor, College of Informatics and Computer Sciences.",
-        "requirement": "Requirements include attendance, lab projects, quizzes, and final exams for each subject.",
-        "exam": "Midterms usually happen around Week 8; Finals on Week 16."
+    # --- Teacher Database ---
+    teachers_info = {
+        # 2101 Professors
+        "prof jennifer l. marasigan": {"name": "Prof. Jennifer L. Marasigan",
+                                       "subject": "CpE 403 - Computer Engineering as a Discipline",
+                                       "office": "CICS 2nd Flr"},
+        "prof christia a. manalo": {"name": "Prof. Christia A. Manalo",
+                                    "subject": "ENGG 403 - Computer-Aided Design",
+                                    "office": "AEB 4th Flr"},
+        "prof maria carmela m. carandang": {"name": "Prof. Maria Carmela M. Carandang",
+                                            "subject": "PATHFit 3 - Traditional and Recreational Games",
+                                            "office": "FDC 103"},
+        "prof giovanni c. sarcilla": {"name": "Prof. Giovanni C. Sarcilla",
+                                      "subject": "ENGG 404 - Engineering Economics",
+                                      "office": "AEB 2nd Flr"},
+        "prof monique a. coliat": {"name": "Prof. Monique A. Coliat",
+                                   "subject": "EE 423 - Fundamentals of Electrical Engineering",
+                                   "office": "AEB 4th Flr"},
+        "prof joyce ann g. acob": {"name": "Prof. Joyce Ann G. Acob",
+                                   "subject": "CpE 404 - Programming Logic and Design",
+                                   "office": "CICS 2nd Flr"},
+        "prof mercedita d. ocampo": {"name": "Prof. Mercedita D. Ocampo",
+                                     "subject": "CpE 405 - Discrete Mathematics",
+                                     "office": "CICS 2nd Flr"},
+        "prof jhon kenneth a. de los reyes": {"name": "Prof. Jhon Kenneth A. De Los Reyes",
+                                              "subject": "MATH 403 - Engineering Data Analysis",
+                                              "office": "AEB 4th Flr"},
+        "prof charley b. leuterio": {"name": "Prof. Charley B. Leuterio",
+                                     "subject": "MATH 404 - Differential Equations",
+                                     "office": "AEB 4th Flr"},
+        # 2105 Professors
+        "prof malvin roix orense": {"name": "Prof. Malvin Roix Orense",
+                                    "subject": "ENGG 404 - Engineering Economics",
+                                    "office": "TBA"},
+        "prof anthony hernandez": {"name": "Prof. Anthony Hernandez",
+                                   "subject": "CpE 404 - Programming Logic and Design",
+                                   "office": "TBA"},
+        "prof kristine bejasa": {"name": "Prof. Kristine Bejasa",
+                                 "subject": "EE 423 - Fundamentals of Electrical Engineering",
+                                 "office": "TBA"},
+        "prof laila hernandez": {"name": "Prof. Laila Hernandez",
+                                 "subject": "CpE 403 - Computer Engineering as a Discipline",
+                                 "office": "TBA"},
+        "prof ericka vabes ruolda": {"name": "Prof. Ericka Vabes Ruolda",
+                                     "subject": "ENGG 403 - Computer-Aided Design",
+                                     "office": "TBA"},
+        "prof ryan banua": {"name": "Prof. Ryan Banua",
+                            "subject": "MATH 403 - Engineering Data Analysis",
+                            "office": "TBA"}
     }
 
+    # --- Chat history persistence ---
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+
+    # --- User input ---
+    user_input = st.text_input("You:", placeholder="Ask something...")
+
     if user_input:
-        response = "I'm not sure yet, but you can ask your class representative for details."
-        user_text = user_input.lower()
+        import requests
+        from difflib import get_close_matches
 
-        for key, reply in responses.items():
-            if key in user_text:
-                response = reply
-                break
+        # --- Check teacher database first (fuzzy match) ---
+        user_lower = user_input.lower()
+        response_text = "I'm not sure yet. You can ask your class representative."
 
-        st.markdown(f'<div class="chat-message user">{user_input}</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="chat-message assistant">{response}</div>', unsafe_allow_html=True)
+        closest = get_close_matches(user_lower, teachers_info.keys(), n=1, cutoff=0.6)
+        if closest:
+            info = teachers_info[closest[0]]
+            response_text = f"**{info['name']}**\nSubject: {info['subject']}\nOffice: {info['office']}"
+        else:
+            # --- Fallback: OpenRouter AI ---
+            OPENROUTER_API_KEY = "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"
+            headers = {
+                "Authorization": f"Bearer {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}",
+                "HTTP-Referer": "https://kite-ai-web",
+                "X-Title": "KITE-AI Chatbot"
+            }
+            payload = {
+                "model": "meta-llama/llama-3.3-70b-instruct:free",
+                "messages": [
+                    {"role": "system", "content": 
+                     "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
+                    {"role": "user", "content": user_input}
+                ]
+            }
+            try:
+                with st.spinner("KITE-AI is thinking..."):
+                    response = requests.post(
+                        "https://openrouter.ai/api/v1/chat/completions",
+                        headers=headers,
+                        json=payload
+                    ).json()
+                    response_text = response["choices"][0]["message"]["content"]
+            except Exception as e:
+                response_text = "⚠️ Sorry, I couldn't connect to OpenRouter. Please try again."
 
+        # --- Save to chat history ---
+        st.session_state.chat_history.append({"role": "user", "content": user_input})
+        st.session_state.chat_history.append({"role": "assistant", "content": response_text})
+
+    # --- Display chat history ---
+    for msg in st.session_state.chat_history:
+        role_class = "user" if msg["role"]=="user" else "assistant"
+        st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html=True)
 
 # -------------------- ABOUT --------------------
 elif menu == "📘 About":
@@ -443,6 +515,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
