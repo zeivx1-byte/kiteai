@@ -403,87 +403,86 @@ elif menu == "💬 CPE Chatbot":
     """, unsafe_allow_html=True)
 
     # --- Teacher Database ---
-teachers_info = {
-    # 2101
-    "prof jennifer l. marasigan": {
-        "name": "Prof. Jennifer L. Marasigan",
-        "subject": "CpE 403 - Computer Engineering as a Discipline",
-        "office": "CICS 2nd Flr"
-    },
-    "prof christia a. manalo": {
-        "name": "Prof. Christia A. Manalo",
-        "subject": "ENGG 403 - Computer-Aided Design",
-        "office": "AEB 4th Flr"
-    },
-    "prof maria carmela m. carandang": {
-        "name": "Prof. Maria Carmela M. Carandang",
-        "subject": "PATHFit 3 - Traditional and Recreational Games",
-        "office": "FDC 103"
-    },
-    "prof giovanni c. sarcilla": {
-        "name": "Prof. Giovanni C. Sarcilla",
-        "subject": "ENGG 404 - Engineering Economics",
-        "office": "AEB 2nd Flr"
-    },
-    "prof monique a. coliat": {
-        "name": "Prof. Monique A. Coliat",
-        "subject": "EE 423 - Fundamentals of Electrical Engineering",
-        "office": "AEB 4th Flr"
-    },
-    "prof joyce ann g. acob": {
-        "name": "Prof. Joyce Ann G. Acob",
-        "subject": "CpE 404 - Programming Logic and Design",
-        "office": "CICS 2nd Flr"
-    },
-    "prof mercedita d. ocampo": {
-        "name": "Prof. Mercedita D. Ocampo",
-        "subject": "CpE 405 - Discrete Mathematics",
-        "office": "CICS 2nd Flr"
-    },
-    "prof jhon kenneth a. de los reyes": {
-        "name": "Prof. Jhon Kenneth A. De Los Reyes",
-        "subject": "MATH 403 - Engineering Data Analysis",
-        "office": "AEB 4th Flr"
-    },
-    "prof charley b. leuterio": {
-        "name": "Prof. Charley B. Leuterio",
-        "subject": "MATH 404 - Differential Equations",
-        "office": "AEB 4th Flr"
-    },
+    teachers_info = {
+        # 2101
+        "prof jennifer l. marasigan": {
+            "name": "Prof. Jennifer L. Marasigan",
+            "subject": "CpE 403 - Computer Engineering as a Discipline",
+            "office": "CICS 2nd Flr"
+        },
+        "prof christia a. manalo": {
+            "name": "Prof. Christia A. Manalo",
+            "subject": "ENGG 403 - Computer-Aided Design",
+            "office": "AEB 4th Flr"
+        },
+        "prof maria carmela m. carandang": {
+            "name": "Prof. Maria Carmela M. Carandang",
+            "subject": "PATHFit 3 - Traditional and Recreational Games",
+            "office": "FDC 103"
+        },
+        "prof giovanni c. sarcilla": {
+            "name": "Prof. Giovanni C. Sarcilla",
+            "subject": "ENGG 404 - Engineering Economics",
+            "office": "AEB 2nd Flr"
+        },
+        "prof monique a. coliat": {
+            "name": "Prof. Monique A. Coliat",
+            "subject": "EE 423 - Fundamentals of Electrical Engineering",
+            "office": "AEB 4th Flr"
+        },
+        "prof joyce ann g. acob": {
+            "name": "Prof. Joyce Ann G. Acob",
+            "subject": "CpE 404 - Programming Logic and Design",
+            "office": "CICS 2nd Flr"
+        },
+        "prof mercedita d. ocampo": {
+            "name": "Prof. Mercedita D. Ocampo",
+            "subject": "CpE 405 - Discrete Mathematics",
+            "office": "CICS 2nd Flr"
+        },
+        "prof jhon kenneth a. de los reyes": {
+            "name": "Prof. Jhon Kenneth A. De Los Reyes",
+            "subject": "MATH 403 - Engineering Data Analysis",
+            "office": "AEB 4th Flr"
+        },
+        "prof charley b. leuterio": {
+            "name": "Prof. Charley B. Leuterio",
+            "subject": "MATH 404 - Differential Equations",
+            "office": "AEB 4th Flr"
+        },
 
-    # 2105
-    "prof malvin roix orense": {
-        "name": "Prof. Malvin Roix Orense",
-        "subject": "ENGG 404 - Engineering Economics",
-        "office": "TBA"
-    },
-    "prof anthony hernandez": {
-        "name": "Prof. Anthony Hernandez",
-        "subject": "CpE 404 - Programming Logic and Design",
-        "office": "TBA"
-    },
-    "prof kristine bejasa": {
-        "name": "Prof. Kristine Bejasa",
-        "subject": "EE 423 - Fundamentals of Electrical Engineering",
-        "office": "TBA"
-    },
-    "prof laila hernandez": {
-        "name": "Prof. Laila Hernandez",
-        "subject": "CpE 403 - Computer Engineering as a Discipline",
-        "office": "TBA"
-    },
-    "prof ericka vabes ruolda": {
-        "name": "Prof. Ericka Vabes Ruolda",
-        "subject": "ENGG 403 - Computer-Aided Design",
-        "office": "TBA"
-    },
-    "prof ryan banua": {
-        "name": "Prof. Ryan Banua",
-        "subject": "MATH 403 - Engineering Data Analysis",
-        "office": "TBA"
+        # 2105
+        "prof malvin roix orense": {
+            "name": "Prof. Malvin Roix Orense",
+            "subject": "ENGG 404 - Engineering Economics",
+            "office": "TBA"
+        },
+        "prof anthony hernandez": {
+            "name": "Prof. Anthony Hernandez",
+            "subject": "CpE 404 - Programming Logic and Design",
+            "office": "TBA"
+        },
+        "prof kristine bejasa": {
+            "name": "Prof. Kristine Bejasa",
+            "subject": "EE 423 - Fundamentals of Electrical Engineering",
+            "office": "TBA"
+        },
+        "prof laila hernandez": {
+            "name": "Prof. Laila Hernandez",
+            "subject": "CpE 403 - Computer Engineering as a Discipline",
+            "office": "TBA"
+        },
+        "prof ericka vabes ruolda": {
+            "name": "Prof. Ericka Vabes Ruolda",
+            "subject": "ENGG 403 - Computer-Aided Design",
+            "office": "TBA"
+        },
+        "prof ryan banua": {
+            "name": "Prof. Ryan Banua",
+            "subject": "MATH 403 - Engineering Data Analysis",
+            "office": "TBA"
+        }
     }
-}
-
 
     # --- Persistent cache ---
     cache_file = "chat_cache.json"
@@ -561,6 +560,7 @@ teachers_info = {
 
 
 
+
 # -------------------- ABOUT --------------------
 elif menu == "📘 About":
     st.header("📘 About KITE-AI Web 2.0")
@@ -586,6 +586,7 @@ elif menu == "📘 About":
     </ul>
     </div>
     """, unsafe_allow_html=True)
+
 
 
 
