@@ -334,3 +334,34 @@ elif menu == "💬 CPE Chatbot":
     for msg in st.session_state.chat_history:
         role_class = "user" if msg["role"]=="user" else "assistant"
         st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html
+            for msg in st.session_state.chat_history:
+        role_class = "user" if msg["role"]=="user" else "assistant"
+        st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html=True)
+
+# ================= ABOUT =================
+elif menu == "📘 About":
+    st.header("📘 About KITE-AI Web 2.0")
+    st.markdown("""
+    <div style="
+        background: rgba(40,0,0,0.6); 
+        padding: 20px; 
+        border-radius: 15px; 
+        box-shadow: 0 0 25px rgba(255,60,60,0.3);
+        color: #FFEAEA;
+        font-size: 16px;
+        line-height: 1.6;
+    ">
+    <strong>Developed for:</strong> Computer Engineering 2nd Year<br>
+    <strong>Purpose:</strong> Integrate Engineering problem-solving and basic AI simulations<br>
+    <strong>Modules Included:</strong>
+    <ul>
+        <li>Task Manager</li>
+        <li>Physics & Electrical Calculators</li>
+        <li>Unit Converters</li>
+        <li>AI Demos (Logic Gates, Perceptron)</li>
+        <li>Student Chatbot</li>
+    </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
+
