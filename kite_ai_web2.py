@@ -439,7 +439,7 @@ elif menu == "💬 CPE Chatbot":
                 response_text = st.session_state.api_cache[user_input]
             else:
                 # --- Hardcoded OpenRouter API key ---
-                OPENROUTER_API_KEY = "sk-or-your-actual-key-here"  # <--- Replace with your key
+                OPENROUTER_API_KEY = "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"  # <--- Replace with your key
                 headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
                 payload = {
                     "model": "meta-llama/llama-2-7b-chat:free",
@@ -500,6 +500,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
