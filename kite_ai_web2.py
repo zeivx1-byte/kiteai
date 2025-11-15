@@ -404,9 +404,11 @@ elif menu == "💬 CPE Chatbot":
         # Add other professors here
     }
 
-    # --- Chat history persistence ---
+    # --- Chat history & API cache ---
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
+    if "api_cache" not in st.session_state:
+        st.session_state.api_cache = {}  # key: question, value: answer
 
     # --- User input ---
     user_input = st.text_input("You:", placeholder="Ask something...")
@@ -414,8 +416,9 @@ elif menu == "💬 CPE Chatbot":
     if user_input:
         from difflib import get_close_matches
         import requests
+        import os
 
-        # --- Check teacher database first (fuzzy match) ---
+        # --- Check teacher database first ---
         user_lower = user_input.lower()
         response_text = "🤔 I'm not sure yet. You can ask your class representative."
 
@@ -424,40 +427,46 @@ elif menu == "💬 CPE Chatbot":
             info = teachers_info[closest[0]]
             response_text = f"**{info['name']}**\nSubject: {info['subject']}\nOffice: {info['office']}"
         else:
-            # --- Fallback: OpenRouter AI ---
-            OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "your_api_key_here")
-            headers = {
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "HTTP-Referer": "https://kite-ai-web",
-                "X-Title": "KITE-AI Chatbot"
-            }
-            payload = {
-                "model": "meta-llama/llama-3.3-70b-instruct:free",
-                "messages": [
-                    {"role": "system", "content": 
-                     "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
-                    {"role": "user", "content": user_input}
-                ]
-            }
-            try:
-                with st.spinner("KITE-AI is thinking..."):
-                    response = requests.post(
-                        "https://openrouter.ai/api/v1/chat/completions",
-                        headers=headers,
-                        json=payload,
-                        timeout=8  # <-- prevents hanging
+            # --- Check if cached ---
+            if user_input in st.session_state.api_cache:
+                response_text = st.session_state.api_cache[user_input]
+            else:
+                # --- Call OpenRouter ---
+                OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "your_api_key_here")
+                headers = {
+                    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                    "HTTP-Referer": "https://kite-ai-web",
+                    "X-Title": "KITE-AI Chatbot"
+                }
+                payload = {
+                    "model": "meta-llama/llama-3.3-70b-instruct:free",
+                    "messages": [
+                        {"role": "system", "content": 
+                         "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
+                        {"role": "user", "content": user_input}
+                    ]
+                }
+                try:
+                    with st.spinner("KITE-AI is thinking..."):
+                        response = requests.post(
+                            "https://openrouter.ai/api/v1/chat/completions",
+                            headers=headers,
+                            json=payload,
+                            timeout=8
+                        )
+                        response.raise_for_status()
+                        data = response.json()
+                        response_text = data["choices"][0]["message"]["content"]
+                        # --- Save to cache ---
+                        st.session_state.api_cache[user_input] = response_text
+                except requests.exceptions.RequestException as e:
+                    response_text = (
+                        "⚠️ KITE-AI couldn't reach OpenRouter.\n"
+                        "You can still ask about professors, or try again later.\n"
+                        f"(Error: {e})"
                     )
-                    response.raise_for_status()  # <-- throws error for HTTP issues
-                    data = response.json()
-                    response_text = data["choices"][0]["message"]["content"]
-            except requests.exceptions.RequestException as e:
-                response_text = (
-                    "⚠️ KITE-AI couldn't reach OpenRouter.\n"
-                    "You can still ask about professors, or try again later.\n"
-                    f"(Error: {e})"
-                )
-            except Exception as e:
-                response_text = f"⚠️ Unexpected error: {e}"
+                except Exception as e:
+                    response_text = f"⚠️ Unexpected error: {e}"
 
         # --- Save to chat history ---
         st.session_state.chat_history.append({"role": "user", "content": user_input})
@@ -481,6 +490,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
