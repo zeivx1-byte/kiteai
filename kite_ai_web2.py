@@ -1,47 +1,95 @@
-# kite_ai_web2_fixed_full.py
-# Streamlit Web Version of KITE-AI Web 2.0
-# Fully updated with dark neon red theme, working images, and fixed chatbot
+# kite_ai_web2.py
+# Streamlit Web Version of KITE-AI (Integrated for CPE 2nd Year)
+# Includes Physics, Circuits, AI Toolkit, Task Manager, and CPE Chatbot
 
 import streamlit as st
 import numpy as np
 import os
-import json
-import requests
-import time
-from difflib import get_close_matches
 
-# ----------------------------
-# PAGE CONFIG
-# ----------------------------
+# --- Modern Sophisticated UI Theme ---
 st.set_page_config(page_title="KITE-AI Web 2.0", page_icon="🤖", layout="wide")
+# --- Small Header Icon ---
+icon_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/568672685_718166897320759_4217860298229868715_n.jpg"
 
-# ----------------------------
-# GLOBAL STYLES (Dark Neon Red)
-# ----------------------------
+st.markdown(f"""
+    <div style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: 5px;
+        padding-bottom: 10px;
+    ">
+        <img src="{icon_url}" style="
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255,60,60,0.5);
+            border: 2px solid rgba(255,255,255,0.3);
+        ">
+    </div>
+""", unsafe_allow_html=True)
+
+
+# === GLOBAL THEME (Dark Neon Style + Red Header) ===
 st.markdown("""
 <style>
-/* background */
+/* === GLOBAL BACKGROUND === */
 [data-testid="stAppViewContainer"] {
     background: radial-gradient(circle at top left, #0a0a0f 0%, #101520 60%, #0b0c10 100%);
-    color: #FFEAEA;
+    color: white !important;
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* header */
-header[data-testid="stHeader"] { 
-    background: linear-gradient(90deg,#2b0000,#4a0000,#2b0000); 
-    color: #FF4C4C; 
+/* === HEADER FIX === */
+header[data-testid="stHeader"] {
+    background: linear-gradient(90deg, #2b0000, #4a0000, #2b0000);
+    color: #FF4C4C !important;
+    box-shadow: 0 0 25px rgba(255, 60, 60, 0.3);
+    border-bottom: 1px solid rgba(255, 80, 80, 0.4);
 }
 
-/* sidebar */
+/* === SIDEBAR === */
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #1a0000 0%, #3b0000 100%);
+    background: rgba(30, 0, 0, 0.8);
     backdrop-filter: blur(15px);
-    border-right: 1px solid rgba(255,50,50,0.3);
+    border-right: 1px solid rgba(255, 50, 50, 0.2);
 }
 [data-testid="stSidebar"] * {
     color: #FFD6D6 !important;
 }
+
+/* === HEADINGS === */
+h1, h2, h3, h4 {
+    color: #FF4C4C !important;
+    text-shadow: 0 0 25px rgba(255, 60, 60, 0.5);
+}
+
+/* === BUTTONS === */
+button[kind="primary"] {
+    background: linear-gradient(135deg, #B00000, #FF0000);
+    color: white !important;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 0 15px rgba(255, 60, 60, 0.3);
+    transition: all 0.2s ease-in-out;
+}
+button[kind="primary"]:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
+}
+button {
+    background-color: rgba(40, 0, 0, 0.8) !important;
+    color: #FF4C4C !important;
+    border: 1px solid rgba(255, 50, 50, 0.4);
+    border-radius: 10px;
+    transition: 0.3s;
+}
+button:hover {
+    background-color: rgba(70, 0, 0, 0.9) !important;
+    box-shadow: 0 0 20px rgba(255, 60, 60, 0.4);
+}
+
+/* === SIDEBAR TITLE === */
 [data-testid="stSidebarNav"]::before {
     content: "🔥 KITE-AI SYSTEM";
     margin-left: 15px;
@@ -49,64 +97,33 @@ header[data-testid="stHeader"] {
     font-size: 20px;
     font-weight: 700;
     color: #FF4C4C;
+    text-shadow: 0 0 25px rgba(255, 80, 80, 0.6);
 }
 
-/* buttons */
-button[kind="primary"] {
-    background: linear-gradient(135deg, #B00000, #FF0000);
-    color: white !important;
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 0 15px rgba(255, 60, 60,0.4);
-}
-button[kind="primary"]:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 25px rgba(255,80,80,0.6);
-}
-button, .stButton>button {
-    background-color: rgba(40,0,0,0.8) !important;
-    color: #FF4C4C !important;
-    border: 1px solid rgba(255,50,50,0.4);
-    border-radius: 10px;
-    transition: 0.3s;
-}
-button:hover, .stButton>button:hover {
-    background-color: rgba(70,0,0,0.9) !important;
-    box-shadow: 0 0 20px rgba(255,60,60,0.4);
-}
-
-/* headings */
-h1, h2, h3, h4 { color: #FF4C4C !important; text-shadow: 0 0 25px rgba(255,60,60,0.5); }
-
-/* chat bubbles */
-.chat-box { padding: 12px 18px; margin: 8px 0; border-radius: 14px; max-width: 85%; font-size: 16px; line-height: 1.4; white-space: pre-wrap; }
-.user-msg { background-color: #B00000; color: white; margin-left: auto; text-align: right; }
-.bot-msg { background-color: #f5f5f5; color: #222; margin-right: auto; text-align: left; }
-.chat-container { max-height: 520px; overflow-y: auto; padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,60,60,0.08); }
-
-/* hide footer */
+/* === FOOTER HIDDEN === */
 footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------------------
-# SIDEBAR MENU
-# ----------------------------
+# --- Sidebar Menu ---
 menu = st.sidebar.radio(
     "Navigation",
     ["🏠 Home", "🗂️ Task Manager", "⚙️ Physics Calculator",
-     "📏 Unit Converter", "🔌 Electrical Assistant", "💬 CPE Chatbot", "📘 About"]
+     "📏 Unit Converter", "🔌 Electrical Assistant",
+     "💬 CPE Chatbot", "📘 About"]
 )
 
-# ----------------------------
-# HOME PAGE
-# ----------------------------
+# -------------------- HOME --------------------
+# -------------------- HOME --------------------
 if menu == "🏠 Home":
-    bg_url = "https://upload.wikimedia.org/wikipedia/commons/9/97/Batangas_State_University_logo.png"
+    bg_url = "https://raw.githubusercontent.com/zeivx1-byte/kiteai/main/BSU.jpg"
+
+    # --- Hero Banner ---
     st.markdown(f"""
-    <div style="
+    <style>
+    .hero {{
         position: relative;
-        background-image: url('{bg_url}');
+        background-image: url("{bg_url}");
         background-size: cover;
         background-position: center;
         height: 550px;
@@ -117,18 +134,73 @@ if menu == "🏠 Home":
         flex-direction: column;
         justify-content: center;
         box-shadow: 0 0 30px rgba(255,60,60,0.4);
-    ">
-        <div style='position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);border-radius:15px;'></div>
-        <div style='position:relative;z-index:1;'>
-            <h1 style='font-size:55px;font-weight:800;color:#FF4C4C;text-shadow:0 0 25px rgba(255,60,60,0.7);'>WELCOME TO THE KITE WEB COMPANION</h1>
-            <h3 style='font-size:22px;background:rgba(255,0,0,0.6);display:inline-block;padding:10px 25px;border-radius:10px;color:white;font-weight:600;'>Empowering Computer Engineering Students with Essential Tools</h3>
+    }}
+    .overlay {{
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        border-radius: 15px;
+    }}
+    .hero-content {{
+        position: relative;
+        z-index: 1;
+        padding: 20px;
+    }}
+    .hero h1 {{
+        font-size: 55px;
+        font-weight: 800;
+        color: #FF4C4C;
+        text-shadow: 0 0 25px rgba(255,60,60,0.7);
+    }}
+    .hero h3 {{
+        font-size: 22px;
+        background: rgba(255, 0, 0, 0.6);
+        display: inline-block;
+        padding: 10px 25px;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 0 20px rgba(255,60,60,0.4);
+    }}
+    .vision {{
+        margin-top: 60px;
+        padding: 30px;
+        background: rgba(40, 0, 0, 0.6);
+        border-radius: 15px;
+        box-shadow: 0 0 25px rgba(255, 60, 60, 0.3);
+        text-align: center;
+    }}
+    .vision h2 {{
+        color: #FF4C4C;
+        text-shadow: 0 0 20px rgba(255,60,60,0.5);
+        font-size: 34px;
+        margin-bottom: 15px;
+    }}
+    .vision p {{
+        color: #FFEAEA;
+        font-size: 18px;
+        line-height: 1.6;
+        margin: 0 auto;
+        max-width: 850px;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
+    # --- Hero Section ---
+    st.markdown("""
+    <div class="hero">
+        <div class="overlay"></div>
+        <div class="hero-content">
+            <h1>WELCOME TO THE KITE WEB COMPANION</h1>
+            <h3>Empowering Computer Engineering Students with Essential Tools</h3>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Vision
+    # --- VISION Section ---
     st.markdown("""
-    <div style='margin-top:60px;padding:30px;background:rgba(40,0,0,0.6);border-radius:15px;box-shadow:0 0 25px rgba(255,60,60,0.3);text-align:center;'>
+    <div class="vision">
         <h2>Our VISION</h2>
         <p>
         At <strong>COMKITE</strong>, we are dedicated to revolutionizing the learning experience 
@@ -139,11 +211,10 @@ if menu == "🏠 Home":
     </div>
     """, unsafe_allow_html=True)
 
-# ----------------------------
-# TASK MANAGER
-# ----------------------------
+# -------------------- TASK MANAGER --------------------
 elif menu == "🗂️ Task Manager":
     st.header("🗂️ Task Manager")
+
     task_file = "tasks.txt"
 
     def load_tasks():
@@ -181,25 +252,29 @@ elif menu == "🗂️ Task Manager":
     else:
         st.info("No tasks added yet.")
 
-# ----------------------------
-# PHYSICS CALCULATOR
-# ----------------------------
+# -------------------- PHYSICS CALCULATOR --------------------
 elif menu == "⚙️ Physics Calculator":
     st.header("⚙️ Physics Calculator")
     options = st.selectbox("Choose a formula:", [
-        "Force (F = m * a)", "Work (W = F * d)", "Power (P = W / t)",
-        "Kinetic Energy (KE = 0.5 * m * v²)", "Potential Energy (PE = m * g * h)"
+        "Force (F = m * a)",
+        "Work (W = F * d)",
+        "Power (P = W / t)",
+        "Kinetic Energy (KE = 0.5 * m * v²)",
+        "Potential Energy (PE = m * g * h)"
     ])
+
     if options == "Force (F = m * a)":
         m = st.number_input("Mass (kg)", 0.0)
         a = st.number_input("Acceleration (m/s²)", 0.0)
         if st.button("Compute Force"):
             st.success(f"Force = {m * a:.2f} N")
+
     elif options == "Work (W = F * d)":
         F = st.number_input("Force (N)", 0.0)
         d = st.number_input("Distance (m)", 0.0)
         if st.button("Compute Work"):
             st.success(f"Work = {F * d:.2f} J")
+
     elif options == "Power (P = W / t)":
         W = st.number_input("Work (J)", 0.0)
         t = st.number_input("Time (s)", 0.0)
@@ -208,11 +283,13 @@ elif menu == "⚙️ Physics Calculator":
                 st.success(f"Power = {W / t:.2f} W")
             else:
                 st.error("Time cannot be zero.")
+
     elif options == "Kinetic Energy (KE = 0.5 * m * v²)":
         m = st.number_input("Mass (kg)", 0.0)
         v = st.number_input("Velocity (m/s)", 0.0)
         if st.button("Compute KE"):
             st.success(f"Kinetic Energy = {0.5 * m * v ** 2:.2f} J")
+
     elif options == "Potential Energy (PE = m * g * h)":
         m = st.number_input("Mass (kg)", 0.0)
         g = st.number_input("Gravity (m/s²)", 9.81)
@@ -220,41 +297,52 @@ elif menu == "⚙️ Physics Calculator":
         if st.button("Compute PE"):
             st.success(f"Potential Energy = {m * g * h:.2f} J")
 
-# ----------------------------
-# UNIT CONVERTER
-# ----------------------------
+# -------------------- UNIT CONVERTER --------------------
 elif menu == "📏 Unit Converter":
     st.header("📏 Unit Converter")
     conv_type = st.selectbox("Select Conversion Type:", [
-        "Length (m ↔ ft)", "Mass (kg ↔ lb)", "Temperature (°C ↔ °F)", "Speed (km/h ↔ mph)"
+        "Length (m ↔ ft)",
+        "Mass (kg ↔ lb)",
+        "Temperature (°C ↔ °F)",
+        "Speed (km/h ↔ mph)"
     ])
+
     if conv_type == "Length (m ↔ ft)":
         m = st.number_input("Meters", 0.0)
         st.write(f"{m} m = {m * 3.28084:.2f} ft")
+
     elif conv_type == "Mass (kg ↔ lb)":
         kg = st.number_input("Kilograms", 0.0)
         st.write(f"{kg} kg = {kg * 2.20462:.2f} lb")
+
     elif conv_type == "Temperature (°C ↔ °F)":
         c = st.number_input("Temperature (°C)", 0.0)
-        st.write(f"{c}°C = {(c*9/5)+32:.2f}°F")
+        st.write(f"{c}°C = {(c * 9/5) + 32:.2f}°F")
+
     elif conv_type == "Speed (km/h ↔ mph)":
         kmh = st.number_input("Speed (km/h)", 0.0)
-        st.write(f"{kmh} km/h = {kmh*0.621371:.2f} mph")
+        st.write(f"{kmh} km/h = {kmh * 0.621371:.2f} mph")
 
-# ----------------------------
-# ELECTRICAL ASSISTANT
-# ----------------------------
+# -------------------- ELECTRICAL ASSISTANT --------------------
 elif menu == "🔌 Electrical Assistant":
     st.header("🔌 Electrical Circuit Assistant")
-    option = st.selectbox("Choose Calculation:", ["Ohm's Law (V = I * R)", "Power (P = V * I)", "Series Resistance", "Parallel Resistance"])
+    option = st.selectbox("Choose Calculation:", [
+        "Ohm's Law (V = I * R)",
+        "Power (P = V * I)",
+        "Series Resistance",
+        "Parallel Resistance"
+    ])
+
     if option == "Ohm's Law (V = I * R)":
         I = st.number_input("Current (A)", 0.0)
         R = st.number_input("Resistance (Ω)", 0.0)
-        st.write(f"Voltage = {I*R:.2f} V")
+        st.write(f"Voltage = {I * R:.2f} V")
+
     elif option == "Power (P = V * I)":
         V = st.number_input("Voltage (V)", 0.0)
         I = st.number_input("Current (A)", 0.0)
-        st.write(f"Power = {V*I:.2f} W")
+        st.write(f"Power = {V * I:.2f} W")
+
     elif option == "Series Resistance":
         resistors = st.text_input("Enter resistances (comma-separated):")
         if resistors:
@@ -263,6 +351,7 @@ elif menu == "🔌 Electrical Assistant":
                 st.success(f"Total Resistance = {sum(values):.2f} Ω")
             except:
                 st.error("Invalid input.")
+
     elif option == "Parallel Resistance":
         resistors = st.text_input("Enter resistances (comma-separated):")
         if resistors:
@@ -273,113 +362,194 @@ elif menu == "🔌 Electrical Assistant":
             except:
                 st.error("Invalid input.")
 
-# ----------------------------
-# CPE CHATBOT
-# ----------------------------
+# -------------------- CPE CHATBOT --------------------
 elif menu == "💬 CPE Chatbot":
-    st.header("💬 CPE Chatbot (KITE-AI)")
+    import json
+    import time
+    import requests
+    from difflib import get_close_matches
+    import streamlit as st
+    import os
 
-    OPENROUTER_API_KEY = "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"
-    OPENROUTER_MODEL = "tngtech/deepseek-r1t2-chimera:free"
-    OPENROUTER_HEADERS = {"Authorization": f"Bearer {OPENROUTER_API_KEY}", "Content-Type": "application/json"}
+    st.header("💬 CPE Student ChatBot")
+    st.markdown("Ask me anything about Computer Engineering 2nd Year!")
 
-    # Professor info
+    # --- Chatbot Styling ---
+    st.markdown("""
+    <style>
+    .chat-message {
+        border-radius: 12px;
+        padding: 12px 18px;
+        margin: 8px 0;
+        max-width: 85%;
+        line-height: 1.5;
+        font-size: 16px;
+    }
+    .chat-message.user {
+        background-color: #FF4C4C;
+        color: white;
+        margin-left: auto;
+        text-align: right;
+        box-shadow: 0 0 15px rgba(255,60,60,0.5);
+    }
+    .chat-message.assistant {
+        background-color: #f5f5f5;
+        color: #222;
+        margin-right: auto;
+        text-align: left;
+        box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # --- Teacher Database ---
     teachers_info = {
         # 2101
-        "prof jennifer l. marasigan": {"name":"Prof. Jennifer L. Marasigan","subject":"CpE 403 - Computer Engineering as a Discipline","office":"CICS 2nd Flr"},
-        "prof christia a. manalo": {"name":"Prof. Christia A. Manalo","subject":"ENGG 403 - Computer-Aided Design","office":"AEB 4th Flr"},
-        "prof maria carmela m. carandang": {"name":"Prof. Maria Carmela M. Carandang","subject":"PATHFit 3 - Traditional and Recreational Games","office":"FDC 103"},
-        "prof giovanni c. sarcilla": {"name":"Prof. Giovanni C. Sarcilla","subject":"ENGG 404 - Engineering Economics","office":"AEB 2nd Flr"},
-        "prof monique a. coliat": {"name":"Prof. Monique A. Coliat","subject":"EE 423 - Fundamentals of Electrical Engineering","office":"AEB 4th Flr"},
-        "prof joyce ann g. acob": {"name":"Prof. Joyce Ann G. Acob","subject":"CpE 404 - Programming Logic and Design","office":"CICS 2nd Flr"},
-        "prof mercedita d. ocampo": {"name":"Prof. Mercedita D. Ocampo","subject":"CpE 405 - Discrete Mathematics","office":"CICS 2nd Flr"},
-        "prof jhon kenneth a. de los reyes": {"name":"Prof. Jhon Kenneth A. De Los Reyes","subject":"MATH 403 - Engineering Data Analysis","office":"AEB 4th Flr"},
-        "prof charley b. leuterio": {"name":"Prof. Charley B. Leuterio","subject":"MATH 404 - Differential Equations","office":"AEB 4th Flr"},
+        "prof jennifer l. marasigan": {"name": "Prof. Jennifer L. Marasigan", "subject": "CpE 403 - Computer Engineering as a Discipline", "office": "CICS 2nd Flr"},
+        "prof christia a. manalo": {"name": "Prof. Christia A. Manalo", "subject": "ENGG 403 - Computer-Aided Design", "office": "AEB 4th Flr"},
+        "prof maria carmela m. carandang": {"name": "Prof. Maria Carmela M. Carandang", "subject": "PATHFit 3 - Traditional and Recreational Games", "office": "FDC 103"},
+        "prof giovanni c. sarcilla": {"name": "Prof. Giovanni C. Sarcilla", "subject": "ENGG 404 - Engineering Economics", "office": "AEB 2nd Flr"},
+        "prof monique a. coliat": {"name": "Prof. Monique A. Coliat", "subject": "EE 423 - Fundamentals of Electrical Engineering", "office": "AEB 4th Flr"},
+        "prof joyce ann g. acob": {"name": "Prof. Joyce Ann G. Acob", "subject": "CpE 404 - Programming Logic and Design", "office": "CICS 2nd Flr"},
+        "prof mercedita d. ocampo": {"name": "Prof. Mercedita D. Ocampo", "subject": "CpE 405 - Discrete Mathematics", "office": "CICS 2nd Flr"},
+        "prof jhon kenneth a. de los reyes": {"name": "Prof. Jhon Kenneth A. De Los Reyes", "subject": "MATH 403 - Engineering Data Analysis", "office": "AEB 4th Flr"},
+        "prof charley b. leuterio": {"name": "Prof. Charley B. Leuterio", "subject": "MATH 404 - Differential Equations", "office": "AEB 4th Flr"},
         # 2105
-        "prof malvin roix orense": {"name":"Prof. Malvin Roix Orense","subject":"ENGG 404 - Engineering Economics","office":"TBA"},
-        "prof anthony hernandez": {"name":"Prof. Anthony Hernandez","subject":"CpE 404 - Programming Logic and Design","office":"TBA"},
-        "prof kristine bejasa": {"name":"Prof. Kristine Bejasa","subject":"EE 423 - Fundamentals of Electrical Engineering","office":"TBA"},
-        "prof laila hernandez": {"name":"Prof. Laila Hernandez","subject":"CpE 403 - Computer Engineering as a Discipline","office":"TBA"},
-        "prof ericka vabes ruolda": {"name":"Prof. Ericka Vabes Ruolda","subject":"ENGG 403 - Computer-Aided Design","office":"TBA"},
-        "prof ryan banua": {"name":"Prof. Ryan Banua","subject":"MATH 403 - Engineering Data Analysis","office":"TBA"}
+        "prof malvin roix orense": {"name": "Prof. Malvin Roix Orense", "subject": "ENGG 404 - Engineering Economics", "office": "TBA"},
+        "prof anthony hernandez": {"name": "Prof. Anthony Hernandez", "subject": "CpE 404 - Programming Logic and Design", "office": "TBA"},
+        "prof kristine bejasa": {"name": "Prof. Kristine Bejasa", "subject": "EE 423 - Fundamentals of Electrical Engineering", "office": "TBA"},
+        "prof laila hernandez": {"name": "Prof. Laila Hernandez", "subject": "CpE 403 - Computer Engineering as a Discipline", "office": "TBA"},
+        "prof ericka vabes ruolda": {"name": "Prof. Ericka Vabes Ruolda", "subject": "ENGG 403 - Computer-Aided Design", "office": "TBA"},
+        "prof ryan banua": {"name": "Prof. Ryan Banua", "subject": "MATH 403 - Engineering Data Analysis", "office": "TBA"}
     }
 
-    # session states
-    if "chat_history" not in st.session_state: st.session_state.chat_history = []
-    if "api_cache" not in st.session_state: st.session_state.api_cache = {}
-    if "last_request_time" not in st.session_state: st.session_state.last_request_time = 0.0
-    if "pending_reply" not in st.session_state: st.session_state.pending_reply = None
-
-    # helpers
-    def check_professor_query(user_input):
-        lower = user_input.lower()
-        for key, info in teachers_info.items():
-            if key in lower or info["name"].lower() in lower:
-                return f"👨‍🏫 **{info['name']}**\n**Subject:** {info['subject']}\n**Office:** {info['office']}"
-        matches = get_close_matches(lower, list(teachers_info.keys()), n=1, cutoff=0.6)
-        if matches:
-            info = teachers_info[matches[0]]
-            return f"👨‍🏫 **{info['name']}**\n**Subject:** {info['subject']}\n**Office:** {info['office']}"
-        return None
-
-   
-    # ----------------------------
-    # CHATBOT INTERFACE
-    # ----------------------------
-    st.subheader("Ask about your professors, subjects, or general queries:")
-    user_input = st.text_input("You:", key="user_input")
-
-    if st.button("Send") and user_input:
-        # check professor info first
-        prof_info = check_professor_query(user_input)
-        if prof_info:
-            st.session_state.chat_history.append(("You", user_input))
-            st.session_state.chat_history.append(("Bot", prof_info))
+    # --- Persistent cache ---
+    cache_file = "chat_cache.json"
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+    if "api_cache" not in st.session_state:
+        if os.path.exists(cache_file):
+            with open(cache_file, "r") as f:
+                st.session_state.api_cache = json.load(f)
         else:
-            # fallback AI reply using OpenRouter API
-            payload = {
-                "model": OPENROUTER_MODEL,
-                "input": user_input
-            }
-            try:
-                response = requests.post("https://openrouter.ai/api/v1/chat/completions",
-                                         headers=OPENROUTER_HEADERS, data=json.dumps(payload))
-                result = response.json()
-                bot_reply = result.get("completion", "Sorry, I couldn't understand that.")
-            except Exception as e:
-                bot_reply = "Error connecting to OpenRouter API."
+            st.session_state.api_cache = {}
 
-            st.session_state.chat_history.append(("You", user_input))
-            st.session_state.chat_history.append(("Bot", bot_reply))
+    # --- User input ---
+    user_input = st.text_input("You:", placeholder="Ask something...")
 
-    # display chat history
-    if st.session_state.chat_history:
-        st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-        for sender, msg in st.session_state.chat_history:
-            if sender == "You":
-                st.markdown(f'<div class="chat-box user-msg">{msg}</div>', unsafe_allow_html=True)
+    if user_input:
+        response_text = "🤔 I'm not sure yet. You can ask your class representative."
+
+        # --- Check teacher database first ---
+        closest = get_close_matches(user_input.lower(), teachers_info.keys(), n=1, cutoff=0.6)
+        if closest:
+            info = teachers_info[closest[0]]
+            response_text = f"**{info['name']}**\nSubject: {info['subject']}\nOffice: {info['office']}"
+        else:
+            # --- Check persistent cache ---
+            if user_input in st.session_state.api_cache:
+                response_text = st.session_state.api_cache[user_input]
             else:
-                st.markdown(f'<div class="chat-box bot-msg">{msg}</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+                # --- Hardcoded working OpenRouter API key ---
+                OPENROUTER_API_KEY = "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"
+                headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
+                payload = {
+                    "model": "qwen/qwen3-coder:free",
+                    "messages": [
+                        {"role": "system", "content": "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
+                        {"role": "user", "content": user_input}
+                    ]
+                }
 
-# ----------------------------
-# ABOUT PAGE
-# ----------------------------
+                for attempt in range(2):
+                    try:
+                        with st.spinner("KITE-AI is thinking..."):
+                            response = requests.post(
+                                "https://openrouter.ai/api/v1/chat/completions",
+                                headers=headers,
+                                json=payload,
+                                timeout=30
+                            )
+                            response.raise_for_status()
+                            data = response.json()
+                            response_text = data["choices"][0]["message"]["content"]
+
+                            # Save session & persistent cache
+                            st.session_state.api_cache[user_input] = response_text
+                            with open(cache_file, "w") as f:
+                                json.dump(st.session_state.api_cache, f, indent=2)
+                            break
+                    except requests.exceptions.RequestException as e:
+                        if attempt == 0:
+                            time.sleep(2)
+                        else:
+                            response_text = f"⚠️ OpenRouter request failed: {e}\nYou can still ask about professors."
+                    except Exception as e:
+                        response_text = f"⚠️ Unexpected error: {e}"
+
+        # --- Save chat history ---
+        st.session_state.chat_history.append({"role": "user", "content": user_input})
+        st.session_state.chat_history.append({"role": "assistant", "content": response_text})
+
+    # --- Display chat history ---
+    for msg in st.session_state.chat_history:
+        role_class = "user" if msg["role"]=="user" else "assistant"
+        st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html=True)
+
+
+
+
+# -------------------- ABOUT --------------------
 elif menu == "📘 About":
     st.header("📘 About KITE-AI Web 2.0")
     st.markdown("""
-    **KITE-AI Web Companion** is a fully integrated web application for Computer Engineering students.
-    It combines essential tools like:
+    <div style="
+        background: rgba(40,0,0,0.6); 
+        padding: 20px; 
+        border-radius: 15px; 
+        box-shadow: 0 0 25px rgba(255,60,60,0.3);
+        color: #FFEAEA;
+        font-size: 16px;
+        line-height: 1.6;
+    ">
+    <strong>Developed for:</strong> Computer Engineering 2nd Year<br>
+    <strong>Purpose:</strong> To integrate Engineering problem-solving and basic AI simulations<br>
+    <strong>Modules Included:</strong>
+    <ul>
+        <li>Task Manager</li>
+        <li>Physics & Electrical Calculators</li>
+        <li>Unit Converters</li>
+        <li>AI Demos (Logic Gates, Perceptron)</li>
+        <li>Student Chatbot</li>
+    </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
-    - **Physics Calculators** for quick engineering computations
-    - **Unit Converters** for standard measurement conversions
-    - **Electrical Assistants** to solve Ohm's Law, series/parallel resistances, and power calculations
-    - **Task Manager** for organizing your daily academic workload
-    - **CPE Chatbot** powered by OpenRouter AI to quickly answer questions about professors, subjects, and engineering topics
 
-    This project was designed to enhance the learning experience, streamline tasks, and provide a one-stop solution for CPE students.
-    
-    **Developed by:** COMKITE Team  
-    **Version:** 2.0
-    """)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
