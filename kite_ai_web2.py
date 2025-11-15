@@ -378,9 +378,9 @@ st.title("🤖 KITE-AI Web 2.0 — CPE Chatbot")
 st.write("AI-Powered Assistant with Faculty Search + OpenRouter Models")
 
 # ------------------------------
-# OPENROUTER API SETUP
+# HARD-CODED OPENROUTER API KEY
 # ------------------------------
-OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", "")
+OPENROUTER_API_KEY = "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"
 
 HEADERS = {
     "Authorization": f"Bearer {OPENROUTER_API_KEY}",
@@ -473,6 +473,42 @@ if st.button("Send"):
         else:
             # 2 — Use OpenRouter AI
             if not OPENROUTER_API_KEY:
+                st.error("❌ API key missing!")
+            else:
+                st.info("🧠 Asking OpenRouter…")
+                reply = ask_openrouter(model_choice, user_input)
+                st.write("### 🤖 AI Response:")
+                st.write(reply)
+
+# ------------------------------
+# UI — MODEL SELECTOR
+# ------------------------------
+model_choice = st.selectbox(
+    "Choose OpenRouter model:",
+    [
+        "tngtech/deepseek-r1t2-chimera:free",
+        "qwen/qwen3-coder:free",
+        "meta-llama/llama-3.2-3b-instruct:free",
+        "google/gemini-2.0-flash-exp:free"
+    ]
+)
+
+# ------------------------------
+# CHAT INPUT
+# ------------------------------
+user_input = st.text_input("💬 Ask something:")
+
+if st.button("Send"):
+    if not user_input:
+        st.warning("Please enter a question.")
+    else:
+        # 1 — Check if it's about a professor
+        prof_answer = check_professor_query(user_input)
+        if prof_answer:
+            st.success(prof_answer)
+        else:
+            # 2 — Use OpenRouter AI
+            if not OPENROUTER_API_KEY:
                 st.error("❌ No API key found in secrets!")
             else:
                 st.info("🧠 Asking OpenRouter…")
@@ -508,6 +544,7 @@ elif menu == "📘 About":
     </ul>
     </div>
     """, unsafe_allow_html=True)
+
 
 
 
