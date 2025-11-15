@@ -417,6 +417,7 @@ elif menu == "💬 CPE Chatbot":
         from difflib import get_close_matches
         import requests
         import os
+        import time
 
         # --- Check teacher database first ---
         user_lower = user_input.lower()
@@ -427,17 +428,13 @@ elif menu == "💬 CPE Chatbot":
             info = teachers_info[closest[0]]
             response_text = f"**{info['name']}**\nSubject: {info['subject']}\nOffice: {info['office']}"
         else:
-            # --- Check if cached ---
+            # --- Check cache first ---
             if user_input in st.session_state.api_cache:
                 response_text = st.session_state.api_cache[user_input]
             else:
-                # --- Call OpenRouter ---
+                # --- OpenRouter API call with retry ---
                 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "your_api_key_here")
-                headers = {
-                    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                    "HTTP-Referer": "https://kite-ai-web",
-                    "X-Title": "KITE-AI Chatbot"
-                }
+                headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
                 payload = {
                     "model": "meta-llama/llama-3.3-70b-instruct:free",
                     "messages": [
@@ -446,27 +443,33 @@ elif menu == "💬 CPE Chatbot":
                         {"role": "user", "content": user_input}
                     ]
                 }
-                try:
-                    with st.spinner("KITE-AI is thinking..."):
-                        response = requests.post(
-                            "https://openrouter.ai/api/v1/chat/completions",
-                            headers=headers,
-                            json=payload,
-                            timeout=8
-                        )
-                        response.raise_for_status()
-                        data = response.json()
-                        response_text = data["choices"][0]["message"]["content"]
-                        # --- Save to cache ---
-                        st.session_state.api_cache[user_input] = response_text
-                except requests.exceptions.RequestException as e:
-                    response_text = (
-                        "⚠️ KITE-AI couldn't reach OpenRouter.\n"
-                        "You can still ask about professors, or try again later.\n"
-                        f"(Error: {e})"
-                    )
-                except Exception as e:
-                    response_text = f"⚠️ Unexpected error: {e}"
+
+                for attempt in range(2):  # retry once if first fails
+                    try:
+                        with st.spinner("KITE-AI is thinking..."):
+                            response = requests.post(
+                                "https://openrouter.ai/api/v1/chat/completions",
+                                headers=headers,
+                                json=payload,
+                                timeout=10
+                            )
+                            response.raise_for_status()  # raise HTTPError if status != 200
+                            data = response.json()
+                            response_text = data["choices"][0]["message"]["content"]
+                            # Save to cache
+                            st.session_state.api_cache[user_input] = response_text
+                            break  # success
+                    except requests.exceptions.RequestException as e:
+                        if attempt == 0:
+                            time.sleep(2)  # wait 2s before retry
+                        else:
+                            response_text = (
+                                "⚠️ KITE-AI couldn't reach OpenRouter.\n"
+                                "You can still ask about professors, or try again later.\n"
+                                f"(Error: {e})"
+                            )
+                    except Exception as e:
+                        response_text = f"⚠️ Unexpected error: {e}"
 
         # --- Save to chat history ---
         st.session_state.chat_history.append({"role": "user", "content": user_input})
@@ -490,6 +493,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
