@@ -362,122 +362,124 @@ elif menu == "🔌 Electrical Assistant":
             except:
                 st.error("Invalid input.")
 
-elif menu == "🤖 Student Chatbot":
-    st.title("🤖 KITE-AI Student Chatbot")
-    st.markdown("Chat with your AI assistant about professors, engineering topics, and more.")
+import streamlit as st
+import requests
 
-    # -------------------- Chat History --------------------
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []  # list of {"role": "user"/"assistant", "text": ...}
+# ------------------------------
+# STREAMLIT PAGE CONFIG
+# ------------------------------
+st.set_page_config(
+    page_title="KITE-AI Web 2.0",
+    page_icon="🤖",
+    layout="centered"
+)
 
-    # -------------------- Chat Display Styling --------------------
-    chat_style = """
-        <style>
-            .chat-box {
-                padding: 12px 18px;
-                margin: 8px 0;
-                border-radius: 14px;
-                max-width: 85%;
-                font-size: 16px;
-                line-height: 1.4;
-                white-space: pre-wrap;
-            }
-            .user-msg {
-                background-color: #0066cc;
-                color: white;
-                margin-left: auto;
-            }
-            .bot-msg {
-                background-color: #f1f1f1;
-                color: black;
-                margin-right: auto;
-            }
-            .chat-container {
-                max-height: 450px;
-                overflow-y: auto;
-                padding-right: 10px;
-                border: 1px solid #ccc;
-                border-radius: 12px;
-                padding: 14px;
-                background: white;
-            }
-        </style>
-    """
-    st.markdown(chat_style, unsafe_allow_html=True)
+st.title("🤖 KITE-AI Web 2.0 — CPE Chatbot")
+st.write("AI-Powered Assistant with Faculty Search + OpenRouter Models")
 
-    # -------------------- Teacher Database --------------------
-    teachers_info = {
-        "prof jennifer l. marasigan": {"name": "Prof. Jennifer L. Marasigan","subject": "CpE 403 - Computer Engineering as a Discipline","office": "CICS 2nd Flr"},
-        "prof christia a. manalo": {"name": "Prof. Christia A. Manalo","subject": "ENGG 403 - Computer-Aided Design","office": "AEB 4th Flr"},
-        "prof maria carmela m. carandang": {"name": "Prof. Maria Carmela M. Carandang","subject": "PATHFit 3","office": "FDC 103"},
-        "prof giovanni c. sarcilla": {"name": "Prof. Giovanni C. Sarcilla","subject": "ENGG 404 - Engineering Economics","office": "AEB 2nd Flr"},
-        "prof monique a. coliat": {"name": "Prof. Monique A. Coliat","subject": "EE 423","office": "AEB 4th Flr"},
-        "prof joyce ann g. acob": {"name": "Prof. Joyce Ann G. Acob","subject": "CpE 404","office": "CICS 2nd Flr"},
-        "prof mercedita d. ocampo": {"name": "Prof. Mercedita D. Ocampo","subject": "CpE 405","office": "CICS 2nd Flr"},
-        "prof jhon kenneth a. de los reyes": {"name": "Prof. Jhon Kenneth A. De Los Reyes","subject": "MATH 403","office": "AEB 4th Flr"},
-        "prof charley b. leuterio": {"name": "Prof. Charley B. Leuterio","subject": "MATH 404","office": "AEB 4th Flr"},
-        "prof malvin roix orense": {"name": "Prof. Malvin Roix Orense","subject": "ENGG 404","office": "TBA"},
-        "prof anthony hernandez": {"name": "Prof. Anthony Hernandez","subject": "CpE 404","office": "TBA"},
-        "prof kristine bejasa": {"name": "Prof. Kristine Bejasa","subject": "EE 423","office": "TBA"},
-        "prof laila hernandez": {"name": "Prof. Laila Hernandez","subject": "CpE 403","office": "TBA"},
-        "prof ericka vabes ruolda": {"name": "Prof. Ericka Vabes Ruolda","subject": "ENGG 403","office": "TBA"},
-        "prof ryan banua": {"name": "Prof. Ryan Banua","subject": "MATH 403","office": "TBA"}
+# ------------------------------
+# OPENROUTER API SETUP
+# ------------------------------
+OPENROUTER_API_KEY = st.secrets.get("OPENROUTER_API_KEY", "")
+
+HEADERS = {
+    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+    "Content-Type": "application/json",
+}
+
+# ------------------------------
+# PROFESSOR DATABASE
+# ------------------------------
+professors = {
+    # 2101
+    "Jennifer L. Marasigan": "CICS 2nd Flr",
+    "Christia A. Manalo": "AEB 4th Flr",
+    "Maria Carmela M. Carandang": "FDC 103",
+    "Giovanni C. Sarcilla": "AEB 2nd Flr",
+    "Monique A. Coliat": "AEB 4th Flr",
+    "Joyce Ann G. Acob": "CICS 2nd Flr",
+    "Mercedita D. Ocampo": "CICS 2nd Flr",
+    "Jhon Kenneth A. De Los Reyes": "AEB 4th Flr",
+    "Charley B. Leuterio": "AEB 4th Flr",
+
+    # 2105
+    "Malvin Roix Orense": "AEB Faculty Area",
+    "Anthony Hernandez": "CICS Faculty Area",
+    "Kristine Bejasa": "AEB Faculty Area",
+    "Laila Hernandez": "CICS Faculty Area",
+    "Ericka Vabes Ruolda": "AEB Faculty Area",
+    "Ryan Banua": "AEB Faculty Area",
+}
+
+# ------------------------------
+# FUNCTION — CHECK PROFESSOR QUERY
+# ------------------------------
+def check_professor_query(user_input):
+    for name, room in professors.items():
+        if name.lower() in user_input.lower():
+            return f"📌 **Faculty Room of Prof. {name}:**\n➡️ {room}"
+    return None
+
+# ------------------------------
+# FUNCTION — CALL OPENROUTER API
+# ------------------------------
+def ask_openrouter(model, user_prompt):
+    url = "https://openrouter.ai/api/v1/chat/completions"
+
+    body = {
+        "model": model,
+        "messages": [
+            {"role": "user", "content": user_prompt}
+        ]
     }
 
-    # -------------------- Chat Container --------------------
-    st.markdown("<div class='chat-container'>", unsafe_allow_html=True)
-    for msg in st.session_state.chat_history:
-        role_class = "user-msg" if msg["role"] == "user" else "bot-msg"
-        st.markdown(
-            f"<div class='chat-box {role_class}'>{msg['text']}</div>",
-            unsafe_allow_html=True
-        )
-    st.markdown("</div>", unsafe_allow_html=True)
+    try:
+        response = requests.post(url, headers=HEADERS, json=body)
+        response.raise_for_status()
+        data = response.json()
+        return data["choices"][0]["message"]["content"]
 
-    # -------------------- Input Field --------------------
-    user_input = st.text_input("Type your message:", placeholder="Ask me anything...")
+    except requests.exceptions.HTTPError as e:
+        return f"⚠️ OpenRouter error: {e}"
+    except Exception:
+        return "⚠️ Something went wrong communicating with OpenRouter."
 
-    # -------------------- When User Sends Message --------------------
-    if user_input:
-        st.session_state.chat_history.append({"role": "user", "text": user_input})
+# ------------------------------
+# UI — MODEL SELECTOR
+# ------------------------------
+model_choice = st.selectbox(
+    "Choose OpenRouter model:",
+    [
+        "tngtech/deepseek-r1t2-chimera:free",
+        "qwen/qwen3-coder:free",
+        "meta-llama/llama-3.2-3b-instruct:free",
+        "google/gemini-2.0-flash-exp:free"
+    ]
+)
 
-        key = user_input.lower().strip()
+# ------------------------------
+# CHAT INPUT
+# ------------------------------
+user_input = st.text_input("💬 Ask something:")
 
-        # ----------- Teacher Info Auto Reply -----------
-        if key in teachers_info:
-            t = teachers_info[key]
-            reply = f"👨‍🏫 **{t['name']}**\n\n**Subject:** {t['subject']}\n**Office:** {t['office']}"
-            st.session_state.chat_history.append({"role": "assistant", "text": reply})
-            st.rerun()
+if st.button("Send"):
+    if not user_input:
+        st.warning("Please enter a question.")
+    else:
+        # 1 — Check if it's about a professor
+        prof_answer = check_professor_query(user_input)
+        if prof_answer:
+            st.success(prof_answer)
+        else:
+            # 2 — Use OpenRouter AI
+            if not OPENROUTER_API_KEY:
+                st.error("❌ No API key found in secrets!")
+            else:
+                st.info("🧠 Asking OpenRouter…")
+                reply = ask_openrouter(model_choice, user_input)
+                st.write("### 🤖 AI Response:")
+                st.write(reply)
 
-        # ----------- OpenRouter AI Response -----------
-        with st.spinner("🤖 KITE-AI is thinking..."):
-            try:
-                api_key = st.secrets["OPENROUTER_API_KEY"]
-
-                headers = {
-                    "Authorization": f"Bearer {api_key}",
-                    "Content-Type": "application/json"
-                }
-
-                payload = {
-                    "model": "tngtech/deepseek-r1t2-chimera:free",
-                    "messages": [
-                        {"role": "system", "content": "You are KITE-AI, a helpful assistant for CPE students."},
-                        {"role": "user", "content": user_input}
-                    ]
-                }
-
-                url = "https://openrouter.ai/api/v1/chat/completions"
-                response = requests.post(url, headers=headers, json=payload)
-                bot_reply = response.json()["choices"][0]["message"]["content"]
-
-                st.session_state.chat_history.append({"role": "assistant", "text": bot_reply})
-
-            except Exception as e:
-                st.session_state.chat_history.append({"role": "assistant", "text": f"⚠️ Error: {e}"})
-
-        st.rerun()
 
 
 
@@ -506,6 +508,7 @@ elif menu == "📘 About":
     </ul>
     </div>
     """, unsafe_allow_html=True)
+
 
 
 
