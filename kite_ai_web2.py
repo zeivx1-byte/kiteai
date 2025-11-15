@@ -363,43 +363,129 @@ elif menu == "🔌 Electrical Assistant":
                 st.error("Invalid input.")
 
 
-# --- Hardcoded OpenRouter API key ---
-OPENROUTER_API_KEY = "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"
-headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
-payload = {
-    "model": "meta-llama/llama-2-7b-chat:free",  # make sure your key has access to this model
-    "messages": [
-        {"role": "system", "content": 
-         "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
-        {"role": "user", "content": user_input}
-    ]
-}
+# -------------------- CPE CHATBOT --------------------
+elif menu == "💬 CPE Chatbot":
+    import json
+    import time
+    import requests
+    from difflib import get_close_matches
+    import os
 
-for attempt in range(2):  # retry once
-    try:
-        with st.spinner("KITE-AI is thinking..."):
-            response = requests.post(
-                "https://openrouter.ai/api/v1/chat/completions",
-                headers=headers,
-                json=payload,
-                timeout=30
-            )
-            response.raise_for_status()
-            data = response.json()
-            response_text = data["choices"][0]["message"]["content"]
+    st.header("💬 CPE Student ChatBot")
+    st.markdown("Ask me anything about Computer Engineering 2nd Year!")
 
-            # Save session & persistent cache
-            st.session_state.api_cache[user_input] = response_text
-            with open(cache_file, "w") as f:
-                json.dump(st.session_state.api_cache, f, indent=2)
-            break
-    except requests.exceptions.RequestException as e:
-        if attempt == 0:
-            time.sleep(2)
+    # --- Chatbot Styling ---
+    st.markdown("""
+    <style>
+    .chat-message {
+        border-radius: 12px;
+        padding: 12px 18px;
+        margin: 8px 0;
+        max-width: 85%;
+        line-height: 1.5;
+        font-size: 16px;
+    }
+    .chat-message.user {
+        background-color: #FF4C4C;
+        color: white;
+        margin-left: auto;
+        text-align: right;
+        box-shadow: 0 0 15px rgba(255,60,60,0.5);
+    }
+    .chat-message.assistant {
+        background-color: #f5f5f5;
+        color: #222;
+        margin-right: auto;
+        text-align: left;
+        box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # --- Teacher Database ---
+    teachers_info = {
+        "prof jennifer l. marasigan": {
+            "name": "Prof. Jennifer L. Marasigan",
+            "subject": "CpE 403 - Computer Engineering as a Discipline",
+            "office": "CICS 2nd Flr"
+        },
+        # Add other professors here
+    }
+
+    # --- Persistent cache ---
+    cache_file = "chat_cache.json"
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+    if "api_cache" not in st.session_state:
+        if os.path.exists(cache_file):
+            with open(cache_file, "r") as f:
+                st.session_state.api_cache = json.load(f)
         else:
-            response_text = f"⚠️ OpenRouter request failed: {e}\nYou can still ask about professors."
-    except Exception as e:
-        response_text = f"⚠️ Unexpected error: {e}"
+            st.session_state.api_cache = {}
+
+    # --- User input ---
+    user_input = st.text_input("You:", placeholder="Ask something...")
+
+    if user_input:
+        response_text = "🤔 I'm not sure yet. You can ask your class representative."
+
+        # --- Check teacher database ---
+        closest = get_close_matches(user_input.lower(), teachers_info.keys(), n=1, cutoff=0.6)
+        if closest:
+            info = teachers_info[closest[0]]
+            response_text = f"**{info['name']}**\nSubject: {info['subject']}\nOffice: {info['office']}"
+        else:
+            # --- Check persistent cache ---
+            if user_input in st.session_state.api_cache:
+                response_text = st.session_state.api_cache[user_input]
+            else:
+                # --- Hardcoded OpenRouter API key ---
+                OPENROUTER_API_KEY = "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"
+                headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
+                payload = {
+                    "model": "meta-llama/llama-2-7b-chat:free",
+                    "messages": [
+                        {"role": "system", "content":
+                         "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
+                        {"role": "user", "content": user_input}
+                    ]
+                }
+
+                for attempt in range(2):  # retry once
+                    try:
+                        with st.spinner("KITE-AI is thinking..."):
+                            response = requests.post(
+                                "https://openrouter.ai/api/v1/chat/completions",
+                                headers=headers,
+                                json=payload,
+                                timeout=30
+                            )
+                            response.raise_for_status()
+                            data = response.json()
+                            response_text = data["choices"][0]["message"]["content"]
+
+                            # Save session & persistent cache
+                            st.session_state.api_cache[user_input] = response_text
+                            with open(cache_file, "w") as f:
+                                json.dump(st.session_state.api_cache, f, indent=2)
+                            break
+                    except requests.exceptions.RequestException as e:
+                        if attempt == 0:
+                            time.sleep(2)
+                        else:
+                            response_text = f"⚠️ OpenRouter request failed: {e}\nYou can still ask about professors."
+                    except Exception as e:
+                        response_text = f"⚠️ Unexpected error: {e}"
+
+        # --- Save chat history ---
+        st.session_state.chat_history.append({"role": "user", "content": user_input})
+        st.session_state.chat_history.append({"role": "assistant", "content": response_text})
+
+    # --- Display chat history ---
+    for msg in st.session_state.chat_history:
+        role_class = "user" if msg["role"] == "user" else "assistant"
+        st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html=True)
+
 
 # -------------------- ABOUT --------------------
 elif menu == "📘 About":
@@ -426,6 +512,8 @@ elif menu == "📘 About":
     </ul>
     </div>
     """, unsafe_allow_html=True)
+
+
 
 
 
