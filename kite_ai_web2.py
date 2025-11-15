@@ -469,11 +469,13 @@ elif menu == "💬 CPE Chatbot":
         else:
             # --- Fallback: OpenRouter AI ---
             OPENROUTER_API_KEY = "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"
-            headers = {
-                "Authorization": f"Bearer {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}",
-                "HTTP-Referer": "https://kite-ai-web",
-                "X-Title": "KITE-AI Chatbot"
-            }
+headers = {
+    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+    "HTTP-Referer": "https://kite-ai-web",
+    "X-Title": "KITE-AI Chatbot"
+}
+
+            
             payload = {
                 "model": "meta-llama/llama-3.3-70b-instruct:free",
                 "messages": [
@@ -515,6 +517,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
