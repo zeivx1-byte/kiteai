@@ -323,3 +323,63 @@ elif menu == "💬 CPE Chatbot":
         return None
 
    
+    # ----------------------------
+    # CHATBOT INTERFACE
+    # ----------------------------
+    st.subheader("Ask about your professors, subjects, or general queries:")
+    user_input = st.text_input("You:", key="user_input")
+
+    if st.button("Send") and user_input:
+        # check professor info first
+        prof_info = check_professor_query(user_input)
+        if prof_info:
+            st.session_state.chat_history.append(("You", user_input))
+            st.session_state.chat_history.append(("Bot", prof_info))
+        else:
+            # fallback AI reply using OpenRouter API
+            payload = {
+                "model": OPENROUTER_MODEL,
+                "input": user_input
+            }
+            try:
+                response = requests.post("https://openrouter.ai/api/v1/chat/completions",
+                                         headers=OPENROUTER_HEADERS, data=json.dumps(payload))
+                result = response.json()
+                bot_reply = result.get("completion", "Sorry, I couldn't understand that.")
+            except Exception as e:
+                bot_reply = "Error connecting to OpenRouter API."
+
+            st.session_state.chat_history.append(("You", user_input))
+            st.session_state.chat_history.append(("Bot", bot_reply))
+
+    # display chat history
+    if st.session_state.chat_history:
+        st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+        for sender, msg in st.session_state.chat_history:
+            if sender == "You":
+                st.markdown(f'<div class="chat-box user-msg">{msg}</div>', unsafe_allow_html=True)
+            else:
+                st.markdown(f'<div class="chat-box bot-msg">{msg}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+# ----------------------------
+# ABOUT PAGE
+# ----------------------------
+elif menu == "📘 About":
+    st.header("📘 About KITE-AI Web 2.0")
+    st.markdown("""
+    **KITE-AI Web Companion** is a fully integrated web application for Computer Engineering students.
+    It combines essential tools like:
+
+    - **Physics Calculators** for quick engineering computations
+    - **Unit Converters** for standard measurement conversions
+    - **Electrical Assistants** to solve Ohm's Law, series/parallel resistances, and power calculations
+    - **Task Manager** for organizing your daily academic workload
+    - **CPE Chatbot** powered by OpenRouter AI to quickly answer questions about professors, subjects, and engineering topics
+
+    This project was designed to enhance the learning experience, streamline tasks, and provide a one-stop solution for CPE students.
+    
+    **Developed by:** COMKITE Team  
+    **Version:** 2.0
+    """)
+
