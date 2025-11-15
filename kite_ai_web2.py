@@ -362,13 +362,13 @@ elif menu == "🔌 Electrical Assistant":
             except:
                 st.error("Invalid input.")
 
-
 # -------------------- CPE CHATBOT --------------------
 elif menu == "💬 CPE Chatbot":
     import json
     import time
     import requests
     from difflib import get_close_matches
+    import streamlit as st
     import os
 
     st.header("💬 CPE Student ChatBot")
@@ -405,86 +405,25 @@ elif menu == "💬 CPE Chatbot":
     # --- Teacher Database ---
     teachers_info = {
         # 2101
-        "prof jennifer l. marasigan": {
-            "name": "Prof. Jennifer L. Marasigan",
-            "subject": "CpE 403 - Computer Engineering as a Discipline",
-            "office": "CICS 2nd Flr"
-        },
-        "prof christia a. manalo": {
-            "name": "Prof. Christia A. Manalo",
-            "subject": "ENGG 403 - Computer-Aided Design",
-            "office": "AEB 4th Flr"
-        },
-        "prof maria carmela m. carandang": {
-            "name": "Prof. Maria Carmela M. Carandang",
-            "subject": "PATHFit 3 - Traditional and Recreational Games",
-            "office": "FDC 103"
-        },
-        "prof giovanni c. sarcilla": {
-            "name": "Prof. Giovanni C. Sarcilla",
-            "subject": "ENGG 404 - Engineering Economics",
-            "office": "AEB 2nd Flr"
-        },
-        "prof monique a. coliat": {
-            "name": "Prof. Monique A. Coliat",
-            "subject": "EE 423 - Fundamentals of Electrical Engineering",
-            "office": "AEB 4th Flr"
-        },
-        "prof joyce ann g. acob": {
-            "name": "Prof. Joyce Ann G. Acob",
-            "subject": "CpE 404 - Programming Logic and Design",
-            "office": "CICS 2nd Flr"
-        },
-        "prof mercedita d. ocampo": {
-            "name": "Prof. Mercedita D. Ocampo",
-            "subject": "CpE 405 - Discrete Mathematics",
-            "office": "CICS 2nd Flr"
-        },
-        "prof jhon kenneth a. de los reyes": {
-            "name": "Prof. Jhon Kenneth A. De Los Reyes",
-            "subject": "MATH 403 - Engineering Data Analysis",
-            "office": "AEB 4th Flr"
-        },
-        "prof charley b. leuterio": {
-            "name": "Prof. Charley B. Leuterio",
-            "subject": "MATH 404 - Differential Equations",
-            "office": "AEB 4th Flr"
-        },
-
+        "prof jennifer l. marasigan": {"name": "Prof. Jennifer L. Marasigan", "subject": "CpE 403 - Computer Engineering as a Discipline", "office": "CICS 2nd Flr"},
+        "prof christia a. manalo": {"name": "Prof. Christia A. Manalo", "subject": "ENGG 403 - Computer-Aided Design", "office": "AEB 4th Flr"},
+        "prof maria carmela m. carandang": {"name": "Prof. Maria Carmela M. Carandang", "subject": "PATHFit 3 - Traditional and Recreational Games", "office": "FDC 103"},
+        "prof giovanni c. sarcilla": {"name": "Prof. Giovanni C. Sarcilla", "subject": "ENGG 404 - Engineering Economics", "office": "AEB 2nd Flr"},
+        "prof monique a. coliat": {"name": "Prof. Monique A. Coliat", "subject": "EE 423 - Fundamentals of Electrical Engineering", "office": "AEB 4th Flr"},
+        "prof joyce ann g. acob": {"name": "Prof. Joyce Ann G. Acob", "subject": "CpE 404 - Programming Logic and Design", "office": "CICS 2nd Flr"},
+        "prof mercedita d. ocampo": {"name": "Prof. Mercedita D. Ocampo", "subject": "CpE 405 - Discrete Mathematics", "office": "CICS 2nd Flr"},
+        "prof jhon kenneth a. de los reyes": {"name": "Prof. Jhon Kenneth A. De Los Reyes", "subject": "MATH 403 - Engineering Data Analysis", "office": "AEB 4th Flr"},
+        "prof charley b. leuterio": {"name": "Prof. Charley B. Leuterio", "subject": "MATH 404 - Differential Equations", "office": "AEB 4th Flr"},
         # 2105
-        "prof malvin roix orense": {
-            "name": "Prof. Malvin Roix Orense",
-            "subject": "ENGG 404 - Engineering Economics",
-            "office": "TBA"
-        },
-        "prof anthony hernandez": {
-            "name": "Prof. Anthony Hernandez",
-            "subject": "CpE 404 - Programming Logic and Design",
-            "office": "TBA"
-        },
-        "prof kristine bejasa": {
-            "name": "Prof. Kristine Bejasa",
-            "subject": "EE 423 - Fundamentals of Electrical Engineering",
-            "office": "TBA"
-        },
-        "prof laila hernandez": {
-            "name": "Prof. Laila Hernandez",
-            "subject": "CpE 403 - Computer Engineering as a Discipline",
-            "office": "TBA"
-        },
-        "prof ericka vabes ruolda": {
-            "name": "Prof. Ericka Vabes Ruolda",
-            "subject": "ENGG 403 - Computer-Aided Design",
-            "office": "TBA"
-        },
-        "prof ryan banua": {
-            "name": "Prof. Ryan Banua",
-            "subject": "MATH 403 - Engineering Data Analysis",
-            "office": "TBA"
-        }
+        "prof malvin roix orense": {"name": "Prof. Malvin Roix Orense", "subject": "ENGG 404 - Engineering Economics", "office": "TBA"},
+        "prof anthony hernandez": {"name": "Prof. Anthony Hernandez", "subject": "CpE 404 - Programming Logic and Design", "office": "TBA"},
+        "prof kristine bejasa": {"name": "Prof. Kristine Bejasa", "subject": "EE 423 - Fundamentals of Electrical Engineering", "office": "TBA"},
+        "prof laila hernandez": {"name": "Prof. Laila Hernandez", "subject": "CpE 403 - Computer Engineering as a Discipline", "office": "TBA"},
+        "prof ericka vabes ruolda": {"name": "Prof. Ericka Vabes Ruolda", "subject": "ENGG 403 - Computer-Aided Design", "office": "TBA"},
+        "prof ryan banua": {"name": "Prof. Ryan Banua", "subject": "MATH 403 - Engineering Data Analysis", "office": "TBA"}
     }
 
-    # --- Persistent cache ---
+    # --- Persistent chat cache ---
     cache_file = "chat_cache.json"
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
@@ -501,7 +440,7 @@ elif menu == "💬 CPE Chatbot":
     if user_input:
         response_text = "🤔 I'm not sure yet. You can ask your class representative."
 
-        # --- Check teacher database ---
+        # --- Check teacher database first ---
         closest = get_close_matches(user_input.lower(), teachers_info.keys(), n=1, cutoff=0.6)
         if closest:
             info = teachers_info[closest[0]]
@@ -511,14 +450,16 @@ elif menu == "💬 CPE Chatbot":
             if user_input in st.session_state.api_cache:
                 response_text = st.session_state.api_cache[user_input]
             else:
-                # --- Hardcoded OpenRouter API key ---
+                # --- Hardcoded OpenRouter key ---
                 OPENROUTER_API_KEY = "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"
-                headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
+                headers = {
+                    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                    "Content-Type": "application/json"
+                }
                 payload = {
-                    "model": "meta-llama/llama-2-7b-chat:free",
+                    "model": "meta-llama/llama-3.2-3b-instruct:free",
                     "messages": [
-                        {"role": "system", "content":
-                         "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
+                        {"role": "system", "content": "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
                         {"role": "user", "content": user_input}
                     ]
                 }
@@ -539,16 +480,15 @@ elif menu == "💬 CPE Chatbot":
                         st.session_state.api_cache[user_input] = response_text
                         with open(cache_file, "w") as f:
                             json.dump(st.session_state.api_cache, f, indent=2)
-
                 except requests.exceptions.HTTPError as e:
-                    if e.response.status_code == 429:
-                        response_text = "⚠️ OpenRouter rate limit reached. Only professor info is available right now."
-                    elif e.response.status_code == 401:
+                    if e.response.status_code == 401:
                         response_text = "⚠️ OpenRouter unauthorized. Only professor info is available."
+                    elif e.response.status_code == 429:
+                        response_text = "⚠️ Too many requests. Try again later."
                     else:
-                        response_text = f"⚠️ OpenRouter request failed: {e}\nYou can still ask about professors."
+                        response_text = f"⚠️ OpenRouter error: {e}"
                 except Exception as e:
-                    response_text = f"⚠️ Unexpected error: {e}\nYou can still ask about professors."
+                    response_text = f"⚠️ Unexpected error: {e}"
 
         # --- Save chat history ---
         st.session_state.chat_history.append({"role": "user", "content": user_input})
@@ -556,8 +496,9 @@ elif menu == "💬 CPE Chatbot":
 
     # --- Display chat history ---
     for msg in st.session_state.chat_history:
-        role_class = "user" if msg["role"] == "user" else "assistant"
+        role_class = "user" if msg["role"]=="user" else "assistant"
         st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html=True)
+
 
 
 
@@ -586,6 +527,7 @@ elif menu == "📘 About":
     </ul>
     </div>
     """, unsafe_allow_html=True)
+
 
 
 
