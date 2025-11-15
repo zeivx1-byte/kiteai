@@ -365,6 +365,12 @@ elif menu == "🔌 Electrical Assistant":
 
 # -------------------- CPE CHATBOT --------------------
 elif menu == "💬 CPE Chatbot":
+    import json
+    import time
+    import requests
+    import os
+    from difflib import get_close_matches
+
     st.header("💬 CPE Student ChatBot")
     st.markdown("Ask me anything about Computer Engineering 2nd Year!")
 
@@ -404,31 +410,31 @@ elif menu == "💬 CPE Chatbot":
         # Add other professors here
     }
 
-    # --- Chat history & API cache ---
+    # --- Persistent cache ---
+    cache_file = "chat_cache.json"
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
     if "api_cache" not in st.session_state:
-        st.session_state.api_cache = {}  # key: question, value: answer
+        # Load persistent cache
+        if os.path.exists(cache_file):
+            with open(cache_file, "r") as f:
+                st.session_state.api_cache = json.load(f)
+        else:
+            st.session_state.api_cache = {}
 
     # --- User input ---
     user_input = st.text_input("You:", placeholder="Ask something...")
 
     if user_input:
-        from difflib import get_close_matches
-        import requests
-        import os
-        import time
-
-        # --- Check teacher database first ---
-        user_lower = user_input.lower()
         response_text = "🤔 I'm not sure yet. You can ask your class representative."
 
-        closest = get_close_matches(user_lower, teachers_info.keys(), n=1, cutoff=0.6)
+        # --- Check teacher database first ---
+        closest = get_close_matches(user_input.lower(), teachers_info.keys(), n=1, cutoff=0.6)
         if closest:
             info = teachers_info[closest[0]]
             response_text = f"**{info['name']}**\nSubject: {info['subject']}\nOffice: {info['office']}"
         else:
-            # --- Check cache first ---
+            # --- Check persistent cache ---
             if user_input in st.session_state.api_cache:
                 response_text = st.session_state.api_cache[user_input]
             else:
@@ -436,7 +442,7 @@ elif menu == "💬 CPE Chatbot":
                 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "your_api_key_here")
                 headers = {"Authorization": f"Bearer {OPENROUTER_API_KEY}"}
                 payload = {
-                    "model": "meta-llama/llama-3.3-70b-instruct:free",
+                    "model": "meta-llama/llama-2-7b-chat:free",  # Known-free model
                     "messages": [
                         {"role": "system", "content": 
                          "You are KITE-AI, a friendly AI assistant for Computer Engineering students."},
@@ -444,34 +450,34 @@ elif menu == "💬 CPE Chatbot":
                     ]
                 }
 
-                for attempt in range(2):  # retry once if first fails
+                for attempt in range(2):  # retry once
                     try:
                         with st.spinner("KITE-AI is thinking..."):
                             response = requests.post(
                                 "https://openrouter.ai/api/v1/chat/completions",
                                 headers=headers,
                                 json=payload,
-                                timeout=10
+                                timeout=30  # increased timeout
                             )
-                            response.raise_for_status()  # raise HTTPError if status != 200
+                            response.raise_for_status()
                             data = response.json()
                             response_text = data["choices"][0]["message"]["content"]
-                            # Save to cache
+
+                            # Save to session cache
                             st.session_state.api_cache[user_input] = response_text
-                            break  # success
+                            # Save persistent cache
+                            with open(cache_file, "w") as f:
+                                json.dump(st.session_state.api_cache, f, indent=2)
+                            break
                     except requests.exceptions.RequestException as e:
                         if attempt == 0:
-                            time.sleep(2)  # wait 2s before retry
+                            time.sleep(2)
                         else:
-                            response_text = (
-                                "⚠️ KITE-AI couldn't reach OpenRouter.\n"
-                                "You can still ask about professors, or try again later.\n"
-                                f"(Error: {e})"
-                            )
+                            response_text = f"⚠️ OpenRouter request failed: {e}\nYou can still ask about professors."
                     except Exception as e:
                         response_text = f"⚠️ Unexpected error: {e}"
 
-        # --- Save to chat history ---
+        # --- Save chat history ---
         st.session_state.chat_history.append({"role": "user", "content": user_input})
         st.session_state.chat_history.append({"role": "assistant", "content": response_text})
 
@@ -479,6 +485,7 @@ elif menu == "💬 CPE Chatbot":
     for msg in st.session_state.chat_history:
         role_class = "user" if msg["role"]=="user" else "assistant"
         st.markdown(f'<div class="chat-message {role_class}">{msg["content"]}</div>', unsafe_allow_html=True)
+
 
 # -------------------- ABOUT --------------------
 elif menu == "📘 About":
@@ -493,6 +500,7 @@ elif menu == "📘 About":
     - AI Demos (Logic Gates, Perceptron)  
     - Student Chatbot  
     """)
+
 
 
 
